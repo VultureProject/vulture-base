@@ -9,7 +9,7 @@ What it basically does is:
  - Installing FreeBSD packages needed by Vulture
  - Installing system scripts to bootstrap Vulture services and Jails
  
-You do not want to bother to follow all these annoying step ?
+You do not want to bother to follow all these annoying steps ? <br>
 Just download the production-ready OVF Image: https://download.vultureproject.org/v4/12.0/isos/vulture4-latest.zip
 
 ## Prerequisite
