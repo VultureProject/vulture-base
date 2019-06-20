@@ -70,7 +70,6 @@ Lastly, **bootstrap** all the required **system jails** : <br>
 ## Configuration of OS
 
 To configure VultureOS, use the `vlt-adm` account, and the `admin` command : <br>
-![Admin MENU](/admin_menu.png)
 
 Using this menu, you have the following choices :
  - **Keymap** : Configure keymap, like during installation of FreeBSD,
