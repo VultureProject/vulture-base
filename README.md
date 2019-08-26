@@ -16,7 +16,7 @@ Just download the production-ready OVF Image: https://download.vultureproject.or
 
 To install vulture-base, you will need a **FreeBSD 12.0**.
 
-That instance must run on a **ZFS disk configuration**.
+That instance must run on a **ZFS disk configuration** with the default pool **"zroot"**. 
 ZFS encryption is supported, but be aware that automatic bootup will no be possible in this case as you will have to type in your passphrase at every reboot.
 
 It is also advised to create a **admin user** before starting as you won't be anymore allowed to use root over ssh for instance. Do not forget to add that user into **sudoers** file. <br>
@@ -38,7 +38,7 @@ And create **repository configuration** file : <br>
 `vim /usr/local/etc/pkg/repos/vulture.conf`
 
     Vulture: {
-        url: https://download.vultureproject.org/v4/12.0/release/,
+        url: https://download.vultureproject.org/v4/12.0/dev/,
         signature_type: "fingerprints",
         fingerprints: "/usr/share/keys/pkg",
         enabled: yes
