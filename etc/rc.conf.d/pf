@@ -1,0 +1,2 @@
+pf_enable="YES"
+pf_rules="/usr/local/etc/pf.conf"

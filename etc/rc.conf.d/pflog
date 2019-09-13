@@ -1,0 +1,2 @@
+#DO NOT ENABLE, AS tshark is used to capture logs to file
+pflog_enable="NO"

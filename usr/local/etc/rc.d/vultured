@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+#
+
+# PROVIDE: vultured
+# REQUIRE: jail
+# BEFORE:  securelevel
+# KEYWORD: shutdown
+
+# Add the following line to /etc/rc.conf to enable `vultured':
+#
+# vultured_enable="YES"
+#
+
+. /etc/rc.subr
+
+name="vultured"
+rcvar=vultured_enable
+
+load_rc_config $name
+
+: ${vultured_enable="NO"}
+
+vultured_user="vlt-os"
+pidfile="/var/run/vulture/vultured.pid"
+procname="/home/vlt-os/env/bin/python3.6"
+command="/usr/sbin/daemon"
+command_args="-f -p ${pidfile} ${procname} /home/vlt-os/vulture_os/daemons/cluster.py"
+
+run_rc_command "$1"

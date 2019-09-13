@@ -1,0 +1,50 @@
+#FIXME
+vlt-adm ALL=NOPASSWD:/usr/bin/su
+
+vlt-adm ALL=NOPASSWD:/usr/sbin/bsdinstall
+vlt-adm ALL=NOPASSWD:/usr/sbin/kbdmap
+vlt-adm ALL=NOPASSWD:/usr/sbin/ntpdate
+vlt-adm ALL=NOPASSWD:/bin/hostname
+
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/write_ntp.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/write_aliases.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/proxy.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/hostname.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/netconfig.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/netconfig-resolv.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/management.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/update_system.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/keymap.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/geli-passphrase.sh
+vlt-adm ALL=NOPASSWD:/bin/mv /tmp/bsdinstall_etc/rc.conf.keymap /etc/
+
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-haproxy.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-mongodb.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-redis.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-rsyslog.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-apache.sh
+
+vlt-adm ALL=NOPASSWD:/usr/sbin/service jail start
+vlt-adm ALL=NOPASSWD:/usr/sbin/service jail stop
+vlt-adm ALL=NOPASSWD:/usr/sbin/service jail restart
+vlt-adm ALL=NOPASSWD:/usr/sbin/service netdata restart
+vlt-adm ALL=NOPASSWD:/usr/sbin/service netif restart
+vlt-adm ALL=NOPASSWD:/usr/sbin/service routing restart
+
+vlt-adm ALL=NOPASSWD:/usr/sbin/jail -cm mongodb
+vlt-adm ALL=NOPASSWD:/usr/sbin/jail -cm rsyslog
+vlt-adm ALL=NOPASSWD:/usr/sbin/jail -cm redis
+vlt-adm ALL=NOPASSWD:/usr/sbin/jail -cm haproxy
+vlt-adm ALL=NOPASSWD:/usr/sbin/jail -cm apache
+
+vlt-adm ALL=NOPASSWD:/usr/sbin/jexec mongodb /bin/csh
+vlt-adm ALL=NOPASSWD:/usr/sbin/jexec rsyslog /bin/csh
+vlt-adm ALL=NOPASSWD:/usr/sbin/jexec redis /bin/csh
+vlt-adm ALL=NOPASSWD:/usr/sbin/jexec apache /bin/csh
+vlt-adm ALL=NOPASSWD:/usr/sbin/jexec haproxy /bin/csh
+vlt-adm ALL=NOPASSWD:/usr/sbin/jexec portal /bin/csh
+
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/gui/django_migration.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/gui/configure.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/gui/cluster_create.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/gui/cluster_join.sh

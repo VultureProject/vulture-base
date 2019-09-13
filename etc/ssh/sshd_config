@@ -1,0 +1,67 @@
+Port 22
+AddressFamily any
+ListenAddress 0.0.0.0
+ListenAddress ::
+
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+Ciphers aes256-ctr
+KexAlgorithms diffie-hellman-group-exchange-sha256,curve25519-sha256
+Macs hmac-sha2-512-etm@openssh.com
+
+RekeyLimit default 1h
+
+SyslogFacility AUTH
+LogLevel INFO
+
+LoginGraceTime 30
+PermitRootLogin no
+StrictModes yes
+MaxAuthTries 3
+MaxSessions 1
+
+PasswordAuthentication yes
+ChallengeResponseAuthentication yes
+PermitEmptyPasswords no
+
+PubkeyAuthentication yes
+AuthorizedKeysFile	.ssh/authorized_keys
+
+HostbasedAuthentication no
+IgnoreUserKnownHosts yes
+IgnoreRhosts yes
+
+UsePAM no
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+GatewayPorts no
+X11Forwarding no
+
+PermitTTY yes
+PrintMotd yes
+
+TCPKeepAlive yes
+PermitUserEnvironment no
+
+Compression delayed
+ClientAliveInterval 0
+ClientAliveCountMax 3
+UseDNS no
+
+PidFile /var/run/sshd.pid
+MaxStartups 10:30:100
+PermitTunnel no
+
+ChrootDirectory none
+UseBlacklist no
+VersionAddendum FreeBSD-20170903
+
+# no default banner path
+Banner none
+
+# override default of no subsystems
+Subsystem	sftp	/usr/libexec/sftp-server
+
