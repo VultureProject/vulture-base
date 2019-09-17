@@ -1,0 +1,2 @@
+syslogd_enable="YES"
+syslogd_flags="-ss -c"

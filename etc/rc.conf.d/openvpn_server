@@ -1,0 +1,2 @@
+openvpn_server_enable="NO"
+openvpn_server_configfile="/usr/local/etc/openvpn/openvpn_server.conf"

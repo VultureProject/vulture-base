@@ -1,0 +1,95 @@
+vlt-os ALL=NOPASSWD:/usr/sbin/chown
+vlt-os ALL=NOPASSWD:/bin/chmod
+vlt-os ALL=NOPASSWD:/bin/mv
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service mongod start
+vlt-os ALL=NOPASSWD:/usr/sbin/service mongod stop
+vlt-os ALL=NOPASSWD:/usr/sbin/service mongod restart
+vlt-os ALL=NOPASSWD:/usr/sbin/service mongod onestatus
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service netdata start
+vlt-os ALL=NOPASSWD:/usr/sbin/service netdata stop
+vlt-os ALL=NOPASSWD:/usr/sbin/service netdata restart
+vlt-os ALL=NOPASSWD:/usr/sbin/service netdata onestatus
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service routing restart
+
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec redis /usr/sbin/service redis onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec mongodb /usr/sbin/service mongod onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec apache /usr/sbin/service apache24 onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec portal /usr/sbin/service apache24 onestatus
+
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec apache /usr/sbin/service apache24 reload
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec apache /usr/sbin/service apache24 restart
+
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy start
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy stop
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy hardstop
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy reload
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy fastreload
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy hardreload
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy restart
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy configtest
+
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service defender onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service defender restart
+
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd restart
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd start
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd stop
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd reload
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan reload
+vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan restart
+vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan onestatusall
+vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan start
+vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan stop
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_client reload
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_client restart
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_client onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_client onestatusall
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_client start
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_client stop
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_server reload
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_server restart
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_server onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_server onestatusall
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_server start
+vlt-os ALL=NOPASSWD:/usr/sbin/service openvpn_server stop
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service vultured start
+vlt-os ALL=NOPASSWD:/usr/sbin/service vultured onestatus
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service darwin onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/service darwin start
+vlt-os ALL=NOPASSWD:/usr/sbin/service darwin restart
+
+vlt-os ALL=NOPASSWD:/sbin/ifconfig
+vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/get_dhcp_address.sh
+vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/write_cert.sh
+vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/add_to_hosts.py
+vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/write_netconfig.sh
+vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/reset_mongo.sh
+vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/reputation.sh
+vlt-os ALL=NOPASSWD:/bin/rm /etc/rc.conf.d/netaliases*
+vlt-os ALL=NOPASSWD:/bin/rm /etc/rc.conf.d/netaliases*
+
+vlt-os ALL=NOPASSWD:/sbin/pfctl -f /usr/local/etc/pf.conf
+vlt-os ALL=NOPASSWD:/usr/sbin/service pf start
+vlt-os ALL=NOPASSWD:/usr/sbin/service pf stop
+vlt-os ALL=NOPASSWD:/usr/sbin/service pf restart
+vlt-os ALL=NOPASSWD:/usr/sbin/service pf onestatus
+
+vlt-os ALL=NOPASSWD:/usr/sbin/service sshd onestatus
+
+vlt-os ALL=NOPASSWD:/usr/local/sbin/vm
+
+#FIXME
+vlt-os ALL=NOPASSWD:/usr/sbin/pkg
+vlt-os ALL=NOPASSWD:/bin/kill -TERM
+

@@ -1,0 +1,23 @@
+
+[1m
+    [1m[38;5;208m__      __ [38;5;220m   _ _                  [38;5;208m   ____   _____
+    [38;5;208m\ \    / / [38;5;220m  | | |                 [38;5;208m  / __ \ / ____|
+    [38;5;208m \ \  / /  [38;5;220m _| | |_ _   _ _ __ ___ [38;5;208m | |  | | (___
+    [38;5;208m  \ \/ / [38;5;220m| | | | __| | | | '__/ _ \[38;5;208m | |  | |\___ \
+    [38;5;208m   \  /[38;5;220m| |_| | | |_| |_| | | |  __/[38;5;208m | |__| |____) |
+    [38;5;208m    \/ [38;5;220m \__,_|_|\__|\__,_|_|  \___|[38;5;208m  \____/|_____/
+
+[0m[1m
+Before seeking technical support, please use the following resources:
+
+o Security advisories and updated errata information for all releases are
+  at [4m[38;5;33mhttps://www.vultureproject.org
+[0m[1m
+o Feel free to ask any question to the community at [4m[38;5;33mvulture@googlegroups.com
+[0m
+[38;5;196m############################################################################
+[38;5;202m###                                                                      ###
+[38;5;208m###[0m[1m   Launch [38;5;40madmin[0m[1m (as [38;5;36mvlt-adm[0m[1m) to access main configuration features  [38;5;208m  ###
+[38;5;214m###                                                                      ###
+[38;5;220m############################################################################
+[0m

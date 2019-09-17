@@ -1,0 +1,32 @@
+ALL : ALL : allow
+
+ALL : PARANOID : RFC931 20 : deny
+
+ALL : localhost 127.0.0.1 : allow
+ALL : [::1] : allow
+
+sendmail : localhost : allow
+sendmail : ALL : allow
+
+exim : localhost : allow
+exim : ALL : allow
+
+rpcbind : ALL : deny
+
+ypserv : localhost : allow
+ypserv : ALL : deny
+
+ftpd : localhost : allow
+ftpd : ALL : allow
+
+fingerd : ALL \
+	: spawn (echo Finger. | \
+	 /usr/bin/mail -s "tcpd\: %u@%h[%a] fingered me!" root) & \
+	: deny
+
+ALL : ALL \
+	: severity auth.info \
+	: twist /bin/echo "You are not welcome to use %d from %h."
+
+sshd : /etc/hosts.deniedssh : deny
+sshd : ALL : allow

@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+#
+
+# PROVIDE: tshark
+# REQUIRE: DAEMON
+# BEFORE:  securelevel
+# KEYWORD: shutdown
+
+# Add the following line to /etc/rc.conf to enable `tshark':
+#
+# tshark_enable="YES"
+#
+
+. /etc/rc.subr
+
+name="tshark"
+desc="tshark paquet capture for pflog, and more"
+rcvar=tshark_enable
+start_precmd="tshark_prestart"
+stop_postcmd="tshark_poststop"
+
+load_rc_config $name
+
+: ${tshark_enable="NO"}
+
+
+tshark_prestart()
+{
+        load_kld pflog || return 1
+
+        # create pflog_dev interface if needed
+        if ! ifconfig $pflog_dev > /dev/null 2>&1; then
+                if ! ifconfig $pflog_dev create; then
+                        warn "could not create $pflog_dev."
+                        return 1
+                fi
+        fi
+
+        # set pflog_dev interface to up state
+        if ! ifconfig $pflog_dev up; then
+                warn "could not bring up $pflog_dev."
+                return 1
+        fi
+
+        # report we're ready to run tshark
+        return 0
+}
+
+tshark_poststop()
+{
+        if ! ifconfig $pflog_dev down; then
+                warn "could not bring down $pflog_dev."
+                return 1
+        fi
+
+        return 0
+}
+
+tshark_user="root"
+pidfile="/var/run/vulture/tshark.pid"
+procname="/usr/local/bin/tshark"
+command="/usr/sbin/daemon"
+command_args="-f -o /var/log/pf/pf.log -p ${pidfile} ${procname} -n -l -i pflog0 -f \"not arp\" -T fields -E separator=, -e frame.time_epoch -e pflog.action -e ip.ttl -e pflog.dir -e pflog.ifname -e ip.proto -e frame.len -e pflog.rulenr -e ip.src -e tcp.srcport -e udp.srcport -e ip.dst -e tcp.dstport -e udp.dstport"
+
+pflog_dev="pflog0"
+run_rc_command "$1"
