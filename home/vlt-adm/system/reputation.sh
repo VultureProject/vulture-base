@@ -12,12 +12,14 @@ if [ -f /etc/rc.conf.proxy ]; then
     export ftp_proxy=${ftp_proxy}
 fi
 
-wget https://dl.vultureproject.org/ipsets/firehol_level1.netset.gz -O /tmp/firehol_level1.netset.gz 2> /dev/null
-wget https://dl.vultureproject.org/ipsets/tor-exit.netset.gz -O /tmp/tor-exit.netset.gz 2> /dev/null
-wget https://dl.vultureproject.org/ipsets/webscanner.netset.gz -O /tmp/webscanner.netset.gz 2> /dev/null
+wget https://predator.vultureproject.org/ipsets/firehol_level1.netset.gz -O /tmp/firehol_level1.netset.gz 2> /dev/null
+wget https://predator.vultureproject.org/ipsets/tor-exit.netset.gz -O /tmp/tor-exit.netset.gz 2> /dev/null
+wget https://predator.vultureproject.org/ipsets/webscanner.netset.gz -O /tmp/webscanner.netset.gz 2> /dev/null
+wget https://predator.vultureproject.org/ipsets/vulture-v4.netset -O /tmp/vulture-v4.netset 2> /dev/null
+wget https://predator.vultureproject.org/ipsets/vulture-v6.netset -O /tmp/vulture-v6.netset 2> /dev/null
 
 gunzip /tmp/firehol_level1.netset.gz
 gunzip /tmp/tor-exit.netset.gz
 gunzip /tmp/webscanner.netset.gz
 
-mv /tmp/*.netset /usr/local/etc/
+mv /tmp/*.netset /var/db/darwin/
