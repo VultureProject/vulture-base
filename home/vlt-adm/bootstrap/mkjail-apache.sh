@@ -124,13 +124,6 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/jail -m "${JAIL}"
 /bin/echo "Ok!"
 
-chown -R vlt-os:wheel /home/jails.apache/.zfs-source/home/vlt-os/
-chmod 750 /home/jails.apache/.zfs-source/home/vlt-os/env
-chmod 750 /home/jails.apache/.zfs-source/home/vlt-os/bootstrap
-chmod 550 /home/jails.apache/.zfs-source/home/vlt-os/bootstrap/*
-chmod 750 /home/jails.apache/.zfs-source/home/vlt-os/scripts
-chmod 550 /home/jails.apache/.zfs-source/home/vlt-os/scripts/*
-chmod 750 /home/jails.apache/.zfs-source/home/vlt-os/vulture_os
 
 cp -rf /home/jails.apache/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
 

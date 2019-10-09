@@ -13,14 +13,76 @@ if [ -f /etc/rc.conf.proxy ]; then
     export ftp_proxy=${ftp_proxy}
 fi
 
-/usr/sbin/pkg update
-/usr/sbin/pkg upgrade -y
+/usr/sbin/pkg update -f
+echo -n "Updating system ..."
 /usr/sbin/freebsd-update --not-running-from-cron fetch install > /dev/null
+echo "ok."
 
-for a in $(/bin/ls /home/ | grep "jails"); do
-    jail="$(/bin/echo "$a" | /usr/bin/sed 's/jails\.//')"
-    /bin/echo "Updating JAIL $jail"
-    /usr/sbin/pkg -j "$jail" update
-    /usr/sbin/pkg -j "$jail" upgrade -y
-    /usr/sbin/freebsd-update -b /home/${a} --not-running-from-cron fetch install > /dev/null
+# If no argument or haproxy asked
+for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
+    if [ -z "$1" -o "$1" == "$jail" ] ; then
+        echo "[-] Updating $jail ..."
+        /usr/sbin/pkg -j "$jail" update -f
+        /usr/sbin/pkg -j "$jail" upgrade -y
+        # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
+        /usr/sbin/pkg upgrade -y "vulture-$jail"
+        echo -n "[-] Updating jail base system files ..."
+        /usr/sbin/freebsd-update -b "/zroot/$jail" --not-running-from-cron fetch install > /dev/null
+        echo "ok."
+        case "$jail" in
+            rsyslog)
+                /usr/sbin/jexec "$jail" /usr/sbin/service rsyslogd restart
+                ;;
+            mongodb)
+                /usr/sbin/jexec "$jail" /usr/sbin/service mongod restart
+                ;;
+            redis)
+                /usr/sbin/jexec "$jail" /usr/sbin/service sentinel stop
+                /usr/sbin/jexec "$jail" /usr/sbin/service redis restart
+                /usr/sbin/jexec "$jail" /usr/sbin/service sentinel start
+                ;;
+            *)
+                /usr/sbin/jexec "$jail" /usr/sbin/service "$jail" restart
+                ;;
+        esac
+        echo "[+] $jail updated."
+    fi
 done
+
+# GUI
+if [ -z "$1" -o "$1" == "gui" ] ; then
+    /usr/sbin/pkg upgrade -y "vulture-gui"
+    /usr/sbin/pkg -j apache update -f
+    /usr/sbin/pkg -j portal update -f
+    /usr/sbin/pkg -j apache upgrade -y
+    /usr/sbin/pkg -j portal upgrade -y
+    /usr/sbin/freebsd-update -b "/zroot/apache" --not-running-from-cron fetch install > /dev/null
+    /usr/sbin/freebsd-update -b "/zroot/portal" --not-running-from-cron fetch install > /dev/null
+    /usr/sbin/jexec apache /usr/sbin/service apache24 restart
+    /usr/sbin/jexec portal /usr/sbin/service apache24 restart
+fi
+
+# If no argument, or Darwin
+if [ -z "$1" -o "$1" == "darwin" ] ; then
+    /usr/sbin/service darwin stop
+    echo "[-] Updating darwin ..."
+    /usr/sbin/pkg upgrade -y darwin
+    echo "[+] Darwin updated, starting service"
+    /usr/sbin/service darwin start
+fi
+
+# If no argument - update all, including vulture-base
+if [ -z "$1" ] ; then
+    echo "[-] Updating vulture-base ..."
+    /usr/sbin/pkg upgrade -y vulture-base
+    echo "[+] Vulture-base updated"
+    echo "[-] Updating all packages ..."
+    # First upgrade libevent & gnutls independently to prevent removing of vulture-base (don't know why...)
+    /usr/sbin/pkg upgrade -y libevent
+    /usr/sbin/pkg upgrade -y gnutls
+    # Then, upgrade all packages
+    /usr/sbin/pkg upgrade -y
+    echo "[+] All packages updated"
+    /usr/sbin/service vultured restart
+    /usr/sbin/service netdata restart
+fi
