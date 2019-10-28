@@ -8,7 +8,7 @@ HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
 Ciphers aes256-ctr
-KexAlgorithms diffie-hellman-group-exchange-sha256,curve25519-sha256
+KexAlgorithms diffie-hellman-group-exchange-sha256,curve25519-sha256,curve25519-sha256@libssh.org
 Macs hmac-sha2-512-etm@openssh.com
 
 RekeyLimit default 1h
