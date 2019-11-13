@@ -8,9 +8,9 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
 fi
 
 bsd_version=$(/usr/bin/uname -r | /usr/bin/cut -d '-' -f 1)
-base_url="https://download.vultureproject.org/v4/${bsd_version}/release/${KERNEL}"
+base_url="https://download.vultureproject.org/v4/${bsd_version}/kernel/${KERNEL}"
 /bin/rm -f /var/tmp/${KERNEL}.txz
-/usr/local/bin/wget "$base_url.txz" -O /var/tmp/${KERNEL}.txz
+/usr/local/bin/wget "$base_url-latest.txz" -O /var/tmp/${KERNEL}.txz
 /usr/local/bin/wget "$base_url.sha256sum" -O /var/tmp/${KERNEL}.sha256sum
 
 /bin/echo -n "Verifying SHASUM for ${KERNEL}.txz... "
