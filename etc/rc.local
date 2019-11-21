@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# This file is part of VultureOS
+#
+
+. /etc/rc.subr
+
+# Get freebsd-swap partition
+swap_part="$(/sbin/gpart show -p | /usr/bin/grep "freebsd-swap" | /usr/bin/awk '{print $3}')"
+# Replace the first "swap" occurence by the swap partition in fstab
+/usr/bin/sed -i '' -e "1,/swap/ s/.*swap.*/\/dev\/$swap_part             none    swap    sw              0       0/" /etc/fstab
+# And activate swap based on /etc/fstab
+/sbin/swapon -aq
