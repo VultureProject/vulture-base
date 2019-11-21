@@ -10,23 +10,28 @@ if [ "$AUTO" != "yes" ] ; then
     /usr/sbin/bsdinstall netconfig
 fi
 if [ -f /tmp/bsdinstall_etc/rc.conf.net ]; then
-    if ! ( /usr/bin/grep "ifconfig_lo0=" /tmp/bsdinstall_etc/rc.conf.net )
+    /bin/cat /tmp/bsdinstall_etc/rc.conf.net >> /etc/rc.conf.d/network
+    if ! ( /usr/bin/grep "ifconfig_lo0=" /etc/rc.conf.d/network > /dev/null 2>&1 )
     then
-        /bin/echo 'ifconfig_lo0="inet 127.0.0.1 netmask 255.255.255.0"' >> /tmp/bsdinstall_etc/rc.conf.net
+        /bin/echo 'ifconfig_lo0="inet 127.0.0.1 netmask 255.255.255.0"' >> /etc/rc.conf.d/network
     fi
-    if ! ( /usr/bin/grep "ifconfig_lo0_ipv6=" /tmp/bsdinstall_etc/rc.conf.net )
+    if ! ( /usr/bin/grep "ifconfig_lo0_ipv6=" /etc/rc.conf.d/network > /dev/null 2>&1 )
     then
-        /bin/echo 'ifconfig_lo0_ipv6="inet6 ::1 prefixlen 128"' >> /tmp/bsdinstall_etc/rc.conf.net
-        /bin/echo 'ifconfig_lo0_alias0="inet6 fd00::201 prefixlen 128"' >> /tmp/bsdinstall_etc/rc.conf.net
+        /bin/echo 'ifconfig_lo0_ipv6="inet6 ::1 prefixlen 128"' >> /etc/rc.conf.d/network
+        /bin/echo 'ifconfig_lo0_alias0="inet6 fd00::201 prefixlen 128"' >> /etc/rc.conf.d/network
     fi
-    if ! ( /usr/bin/grep "ifconfig_tap0=" /tmp/bsdinstall_etc/rc.conf.net )
-    then
-        /bin/echo 'ifconfig_tap0="inet 192.168.1.1 netmask 255.255.255.0"' >> /tmp/bsdinstall_etc/rc.conf.net
-    fi
-    /bin/cp /tmp/bsdinstall_etc/rc.conf.net /etc/rc.conf.d/network
-    if ! ( /usr/bin/grep "cloned_interfaces=" /etc/rc.conf.d/network )
+    if ! ( /usr/bin/grep "cloned_interfaces=" /etc/rc.conf.d/network > /dev/null 2>&1 )
     then
         /bin/echo 'cloned_interfaces="lo1 lo2 lo3 lo4 lo5 lo6"' >> /etc/rc.conf.d/network
+    fi
+    if ! /usr/local/sbin/vm switch info public > /dev/null 2>&1 ; then
+        if ! ( /usr/bin/grep "ifconfig_tap0=" /etc/rc.conf.d/network )
+        then
+            /bin/echo 'ifconfig_tap0="inet 192.168.1.1 netmask 255.255.255.0"' >> /etc/rc.conf.d/network
+        fi
+        if ! ( /usr/bin/grep "cloned_interfaces=" /etc/rc.conf.d/network | /usr/bin/grep "tap0" > /dev/null 2>&1 ) ; then
+            /usr/bin/sed -i '' "s/cloned_interfaces=.*/cloned_interfaces=\"lo1 lo2 lo3 lo4 lo5 lo6 tap0\"/" /etc/rc.conf.d/network
+        fi
     fi
 
     /usr/sbin/service netif restart
