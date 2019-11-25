@@ -18,7 +18,14 @@ echo -n "Updating system ..."
 /usr/sbin/freebsd-update --not-running-from-cron fetch install > /dev/null
 echo "ok."
 
-# If no argument or haproxy asked
+# If no parameter provided, upgrade vulture-base first
+if [ -z "$1" ] ; then
+    echo "[-] Updating vulture-base ..."
+    /usr/sbin/pkg upgrade -y vulture-base
+    echo "[+] Vulture-base updated"
+fi
+
+# If no argument or jail asked
 for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     if [ -z "$1" -o "$1" == "$jail" ] ; then
         echo "[-] Updating $jail ..."
@@ -49,7 +56,7 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     fi
 done
 
-# GUI
+# No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
     /usr/sbin/pkg upgrade -y "vulture-gui"
     /usr/sbin/pkg -j apache update -f
@@ -71,11 +78,8 @@ if [ -z "$1" -o "$1" == "darwin" ] ; then
     /usr/sbin/service darwin start
 fi
 
-# If no argument - update all, including vulture-base
+# If no argument - update all
 if [ -z "$1" ] ; then
-    echo "[-] Updating vulture-base ..."
-    /usr/sbin/pkg upgrade -y vulture-base
-    echo "[+] Vulture-base updated"
     echo "[-] Updating all packages ..."
     # First upgrade libevent & gnutls independently to prevent removing of vulture-base (don't know why...)
     /usr/sbin/pkg upgrade -y libevent
