@@ -41,3 +41,6 @@ fi
 
 /bin/rm -f /var/tmp/${KERNEL}.txz
 /bin/rm -f /var/tmp/${KERNEL_TOOLS}.txz
+
+cp /usr/lib/libhbsdcontrol.so.0 /zroot/apache/usr/lib/libhbsdcontrol.so.0
+cp /usr/sbin/hbsdcontrol /zroot/apache/usr/sbin/hbsdcontrol
