@@ -53,7 +53,7 @@ do
                 "email")
                     /bin/rm -f "$tmp_file"
                     email=`grep '^root:' /etc/mail/aliases | sed -E 's/^.*:.([a-zA-Z0-9_\.-]+@[a-zA-Z0-9_\.-]+)$/\1/g'`
-                    if /usr/bin/dialog --title "Vulture Alert Email address" --inputbox "Enter the email address to send alerts to" 8 60 "${email}" 2> "$tmp_file"; then
+                    if /usr/bin/dialog --title "Vulture Alert Email address" --inputbox "Enter the email address to send alerts to" 8 60 "${email}" --stdout > "$tmp_file"; then
                         email="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
 
@@ -64,7 +64,7 @@ do
                     /usr/bin/passwd vlt-adm
                     ;;
                 "geli_change")
-                    if /usr/bin/dialog --title "Vulture Encryption passphrase" --inputbox "Enter a new encryption passphrase" 8 60 "" 2> "$tmp_file"; then
+                    if /usr/bin/dialog --title "Vulture Encryption passphrase" --inputbox "Enter a new encryption passphrase" 8 60 "" --stdout > "$tmp_file"; then
                         passphrase="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
                         /usr/local/bin/sudo /home/vlt-adm/system/geli-passphrase.sh "${passphrase}"
@@ -81,7 +81,7 @@ do
                         ip="$(/bin/cat /usr/local/etc/management.ip)"
                     fi
 
-                    if /usr/bin/dialog --title "Vulture Management interface" --inputbox "Choose the management IP Address" 8 60 "${ip}" 2> "$tmp_file"; then
+                    if /usr/bin/dialog --title "Vulture Management interface" --inputbox "Choose the management IP Address" 8 60 "${ip}" --stdout > "$tmp_file"; then
                         ip="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
 
@@ -111,7 +111,7 @@ do
                     if [ -f /etc/rc.conf.proxy ]; then
                         proxy="$(/bin/cat /etc/rc.conf.proxy | /usr/bin/grep "http_" | /usr/bin/sed 's/.*http:\/\///')"
                     fi
-                    if /usr/bin/dialog --title "Vulture HTTP Proxy setting" --inputbox "Enter HTTP proxy address (IPv4:port or [IPv6]:port)" 8 60 "${proxy}" 2> "$tmp_file"; then
+                    if /usr/bin/dialog --title "Vulture HTTP Proxy setting" --inputbox "Enter HTTP proxy address (IPv4:port or [IPv6]:port)" 8 60 "${proxy}" --stdout > "$tmp_file"; then
                         proxy="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
 
