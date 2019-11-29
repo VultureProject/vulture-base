@@ -43,3 +43,5 @@ fi
 /bin/rm -f /var/tmp/${KERNEL_TOOLS}.txz
 
 /usr/sbin/hbsdcontrol pax disable mprotect /zroot/apache/usr/local/bin/node
+/usr/sbin/hbsdcontrol pax disable mprotect /home/jails.apache/.zfs-source/home/vlt-os/env/bin/python3.6
+/usr/sbin/hbsdcontrol pax disable pageexec /home/jails.apache/.zfs-source/home/vlt-os/env/bin/python3.6
