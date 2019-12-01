@@ -46,3 +46,4 @@ chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
 service ldconfig restart
 
 sysrc secadm_enable=YES
+service secadm restart
