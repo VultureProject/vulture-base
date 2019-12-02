@@ -43,7 +43,20 @@ fi
 /bin/rm -f /var/tmp/${KERNEL_TOOLS}.txz
 
 chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
+chown root:wheel /usr/local
 service ldconfig restart
 
 sysrc secadm_enable=YES
 service secadm restart
+
+#Deploy secadm in Apache jail
+cp /usr/local/etc/secadm.rules /zroot/apache/usr/local/etc/
+cp /usr/local/lib/libsecadm.so.1 /zroot/apache/usr/local/lib/
+cp /usr/local/sbin/secadm /zroot/apache/usr/local/sbin/
+
+cp /usr/local/etc/secadm-apache.rules /zroot/apache/usr/local/etc/secadm.rules
+jexec apache chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
+jexec apache chown root:wheel /usr/local
+jexec apache service ldconfig restart
+jexec apache sysrc secadm_enable=YES
+jexec apache service secadm restart
