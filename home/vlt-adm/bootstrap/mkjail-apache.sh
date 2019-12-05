@@ -9,8 +9,8 @@ fi
 
 JAIL="apache"
 TARGET="/zroot/apache"
-BASE="http://ftp.freebsd.org/pub/FreeBSD/releases/amd64/12.0-RELEASE/base.txz"
-SHA256="360df303fac75225416ccc0c32358333b90ebcd58e54d8a935a4e13f158d3465"
+BASE="https://download.vultureproject.org/v4/12.1/isos/base.txz"
+SHA256="7a0de3237547315fe6404c651c44b356ee7b9a4bfa6ab022c2734237c3d66ded"
 
 
 if [ -f /etc/rc.conf.proxy ]; then
