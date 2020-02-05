@@ -122,9 +122,9 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/mkdir -p ${TARGET}/usr/local/etc/redis
 /bin/mkdir -p ${TARGET}/var/sockets/redis/
 
-/bin/mkdir -p ${TARGET}/var/db/redis/
-chown redis:redis ${TARGET}/var/db/redis/
-chmod 750 ${TARGET}/var/db/redis/
+/bin/mkdir -p ${TARGET}/var/db/vulture-redis/
+chown redis:redis ${TARGET}/var/db/vulture-redis/
+chmod 750 ${TARGET}/var/db/vulture-redis/
 
 /bin/mkdir -p ${TARGET}/var/run/redis/
 chown redis:redis ${TARGET}/var/run/redis/
