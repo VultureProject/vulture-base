@@ -22,6 +22,10 @@ echo "ok."
 if [ -z "$1" ] ; then
     echo "[-] Updating vulture-base ..."
     /usr/sbin/pkg upgrade -y vulture-base
+
+    /home/vlt-adm/bootstrap/install-kernel.sh
+    /usr/sbin/service secadm restart
+    
     echo "[+] Vulture-base updated"
 fi
 
