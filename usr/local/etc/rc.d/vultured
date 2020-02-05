@@ -27,4 +27,14 @@ procname="/home/vlt-os/env/bin/python3.7"
 command="/usr/sbin/daemon"
 command_args="-f -p ${pidfile} ${procname} /home/vlt-os/vulture_os/daemons/cluster.py"
 
+# Redefine status function to use only pid file (solve issue with old python)
+status_cmd="${name}_status"
+vultured_status() {
+    if [ -f $pidfile ] ; then
+        echo "$name is running as pid $(/bin/cat $pidfile)".
+    else
+        echo "$name is not running."
+    fi
+}
+
 run_rc_command "$1"
