@@ -25,6 +25,12 @@ fi
 /usr/bin/tar xvf /var/tmp/${KERNEL}.txz -C /
 /bin/rm -f /var/tmp/${KERNEL}.txz
 
+#Update GPTZFSBoot with latest image
+sysctl kern.geom.confdot | sed -n 's/^.*hexagon,label="\([^\]*\)\\n\([^\]*\).*/\1 \2/p' | grep '0 .*' |sed 's/ .*//' |grep -v '^cd'|grep -v '^gpt' > /tmp/DISKSLICE_$$
+DISKSLICE=`cat /tmp/DISKSLICE_$$`
+echo "Install Vulture-OS bootcode on ${DISKSLICE}"
+gpart bootcode -b /mnt/boot/pmbr -p /mnt/boot/gptzfsboot -i 1 ${DISKSLICE}
+
 chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
 chown root:wheel /usr/local
 service ldconfig restart
