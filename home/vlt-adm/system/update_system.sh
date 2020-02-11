@@ -77,7 +77,10 @@ fi
 if [ -z "$1" -o "$1" == "darwin" ] ; then
     /usr/sbin/service darwin stop
     echo "[-] Updating darwin ..."
-    /usr/sbin/pkg upgrade -y darwin
+    if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
+        /usr/sbin/pkg upgrade -fy darwin
+    else
+        /usr/sbin/pkg upgrade -y darwin
     echo "[+] Darwin updated, starting service"
     /usr/sbin/service darwin start
 fi
