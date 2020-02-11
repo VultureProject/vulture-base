@@ -18,17 +18,6 @@ echo -n "Updating system ..."
 /usr/sbin/freebsd-update --not-running-from-cron fetch install > /dev/null
 echo "ok."
 
-# If no parameter provided, upgrade vulture-base first
-if [ -z "$1" ] ; then
-    echo "[-] Updating vulture-base ..."
-    /usr/sbin/pkg upgrade -y vulture-base
-
-    /home/vlt-adm/bootstrap/install-kernel.sh
-    /usr/sbin/service secadm restart
-    
-    echo "[+] Vulture-base updated"
-fi
-
 # If no argument or jail asked
 for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     if [ -z "$1" -o "$1" == "$jail" ] ; then
@@ -73,6 +62,18 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
 fi
 
+# If no parameter provided, upgrade vulture-base
+if [ -z "$1" ] ; then
+    echo "[-] Updating vulture-base ..."
+    /usr/sbin/pkg upgrade -y vulture-base
+
+    /home/vlt-adm/bootstrap/install-kernel.sh
+    /usr/sbin/service secadm restart
+    
+    echo "[+] Vulture-base updated"
+fi
+
+
 # If no argument, or Darwin
 if [ -z "$1" -o "$1" == "darwin" ] ; then
     /usr/sbin/service darwin stop
@@ -81,6 +82,7 @@ if [ -z "$1" -o "$1" == "darwin" ] ; then
         /usr/sbin/pkg upgrade -fy darwin
     else
         /usr/sbin/pkg upgrade -y darwin
+    fi
     echo "[+] Darwin updated, starting service"
     /usr/sbin/service darwin start
 fi
