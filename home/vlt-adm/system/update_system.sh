@@ -96,6 +96,9 @@ if [ -z "$1" ] ; then
     # Then, upgrade all packages
     /usr/sbin/pkg upgrade -y
     echo "[+] All packages updated"
-    /usr/sbin/service vultured restart
+    # Do not start vultured if the node is not installed
+    if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+        /usr/sbin/service vultured restart
+    fi
     /usr/sbin/service netdata restart
 fi
