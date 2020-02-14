@@ -89,11 +89,6 @@ vlt-os ALL=NOPASSWD:/usr/sbin/service sshd onestatus
 
 vlt-os ALL=NOPASSWD:/usr/local/sbin/vm
 
-vlt-os ALL=NOPASSWD:/sbin/zfs list*
-vlt-os ALL=NOPASSWD:/sbin/zfs destroy*
-vlt-os ALL=NOPASSWD:/sbin/zfs snapshot*
-vlt-os ALL=NOPASSWD:/sbin/zfs rollback*
-
 #FIXME
 vlt-os ALL=NOPASSWD:/usr/sbin/pkg
 vlt-os ALL=NOPASSWD:/bin/kill -TERM
