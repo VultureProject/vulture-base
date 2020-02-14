@@ -39,14 +39,12 @@ sysrc secadm_enable=YES
 service secadm restart
 
 #Deploy secadm in Apache jail
-cp /usr/local/etc/secadm.rules /zroot/apache/usr/local/etc/
-cp /usr/local/lib/libsecadm.so.1 /zroot/apache/usr/local/lib/
-cp /usr/local/sbin/secadm /zroot/apache/usr/local/sbin/
+#cp /usr/local/lib/libsecadm.so.1 /zroot/apache/usr/local/lib/
+#cp /usr/local/sbin/secadm /zroot/apache/usr/local/sbin/
+#cp /usr/local/etc/rc.d/secadm /zroot/apache/usr/local/etc/rc.d/
+#jexec apache chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
+#jexec apache chown root:wheel /usr/local
+#jexec apache service ldconfig restart
 
-cp /usr/local/etc/secadm-apache.rules /zroot/apache/usr/local/etc/secadm.rules
-cp /usr/local/etc/rc.d/secadm /zroot/apache/usr/local/etc/rc.d/
-jexec apache chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
-jexec apache chown root:wheel /usr/local
-jexec apache service ldconfig restart
 jexec apache sysrc secadm_enable=YES
 jexec apache service secadm restart

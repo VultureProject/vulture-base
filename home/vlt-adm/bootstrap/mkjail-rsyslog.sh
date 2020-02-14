@@ -9,8 +9,8 @@ fi
 
 JAIL="rsyslog"
 TARGET="/zroot/rsyslog"
-BASE="https://download.vultureproject.org/v4/12.1/isos/base.txz"
-SHA256="7a0de3237547315fe6404c651c44b356ee7b9a4bfa6ab022c2734237c3d66ded"
+BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
+SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
 
 if [ -f /etc/rc.conf.proxy ]; then
     . /etc/rc.conf.proxy
