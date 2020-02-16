@@ -102,7 +102,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
-/usr/sbin/pkg -j ${JAIL} install -y mongodb40 || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y mongodb36 || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
 
 /bin/cp /home/jails.mongodb/config/mongodb.conf ${TARGET}/usr/local/etc/
