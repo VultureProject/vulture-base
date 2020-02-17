@@ -106,6 +106,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Ok !"
 
 /bin/cp /home/jails.mongodb/config/mongodb.conf ${TARGET}/usr/local/etc/
+/bin/cp -rf /home/jails.mongodb/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
 
 /bin/mkdir ${TARGET}/var/db/pki
 /bin/mkdir -p ${TARGET}/var/sockets/mongodb/
