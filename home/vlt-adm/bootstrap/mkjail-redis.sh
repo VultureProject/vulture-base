@@ -117,6 +117,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 /usr/sbin/pkg -j ${JAIL} install -y redis  || (echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod  || (echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
 
 /bin/mkdir -p ${TARGET}/usr/local/etc/redis

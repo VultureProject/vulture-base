@@ -98,7 +98,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Ok!"
 
 # No need to verify if already done
-/usr/sbin/pkg -j ${JAIL} install -y jq libevent apr || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y jq libevent apr secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
 
 /bin/cp -r /home/jails.haproxy/.zfs-source/* ${TARGET}/
 

@@ -112,12 +112,12 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y jpeg || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y openssl111 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y node || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y libucl || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
 
 #Haproxy is needed inside the jail to test haproxy configuration (1.9.0 minimum required)
-/usr/sbin/pkg -j ${JAIL} install -y haproxy-devel || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y haproxy || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
 
 # Jail NEEDS to be modified after system file modification !!!

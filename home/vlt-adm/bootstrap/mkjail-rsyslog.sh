@@ -110,7 +110,8 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 /usr/sbin/pkg -j ${JAIL} install -y librelp libfastjson libinotify liblogging curl \
-e2fsprogs-libuuid libmaxminddb hiredis openssl111 pcre icu cyrus-sasl libestr  || (/bin/echo "Fail !" ; exit 1)
+e2fsprogs-libuuid libmaxminddb hiredis pcre icu cyrus-sasl libestr  || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod
 /bin/echo "Ok !"
 
 #Security fix: We do not want the jail to have the curl command available (libcurl is needed by rsyslog)
