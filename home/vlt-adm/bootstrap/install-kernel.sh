@@ -8,6 +8,14 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
 fi
 
 bsd_version=$(/usr/bin/uname -r | /usr/bin/cut -d '-' -f 1)
+bsd_os=$(/usr/bin/uname -i | /usr/bin/cut -d '-' -f 1)
+
+if [ "${bsd_os}" != "HARDENEDBSD" ]; then
+    /bin/echo "!!! WARNING !!!"
+    /bin/echo "You are about to break your system !"
+    /bin/echo "No kernel is available for your Operating System"
+    exit 1
+fi
 
 base_url="https://download.vultureproject.org/v4/${bsd_version}/kernel/${KERNEL}"
 /bin/rm -f /var/tmp/${KERNEL}.txz
@@ -37,14 +45,6 @@ service ldconfig restart
 
 sysrc secadm_enable=YES
 service secadm restart
-
-#Deploy secadm in Apache jail
-#cp /usr/local/lib/libsecadm.so.1 /zroot/apache/usr/local/lib/
-#cp /usr/local/sbin/secadm /zroot/apache/usr/local/sbin/
-#cp /usr/local/etc/rc.d/secadm /zroot/apache/usr/local/etc/rc.d/
-#jexec apache chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
-#jexec apache chown root:wheel /usr/local
-#jexec apache service ldconfig restart
 
 jexec apache sysrc secadm_enable=YES
 jexec apache service secadm restart
