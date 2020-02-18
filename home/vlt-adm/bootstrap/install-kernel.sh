@@ -33,18 +33,17 @@ fi
 /usr/bin/tar xvf /var/tmp/${KERNEL}.txz -C /
 /bin/rm -f /var/tmp/${KERNEL}.txz
 
-#Update GPTZFSBoot with latest image
+# Update GPTZFSBoot with latest image
 sysctl kern.geom.confdot | sed -n 's/^.*hexagon,label="\([^\]*\)\\n\([^\]*\).*/\1 \2/p' | grep '0 .*' |sed 's/ .*//' |grep -v '^cd'|grep -v '^gpt' > /tmp/DISKSLICE_$$
 DISKSLICE=`cat /tmp/DISKSLICE_$$`
 echo "Install Vulture-OS bootcode on ${DISKSLICE}"
-gpart bootcode -b /mnt/boot/pmbr -p /mnt/boot/gptzfsboot -i 1 ${DISKSLICE}
+gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ${DISKSLICE}
 
-chown -R root:wheel /usr/lib/ /usr/sbin/ /usr/local/lib
-chown root:wheel /usr/local
-service ldconfig restart
+# Restart secadm to load new rules
+/usr/sbin/service secadm restart
 
-sysrc secadm_enable=YES
-service secadm restart
+# Deploy secadm config in jails that need exceptions
+cp /usr/local/etc/secadm-apache.rules /zroot/apache/usr/local/etc/secadm.rules
 
-jexec apache sysrc secadm_enable=YES
+# Restart secadm in jails that need exceptions
 jexec apache service secadm restart
