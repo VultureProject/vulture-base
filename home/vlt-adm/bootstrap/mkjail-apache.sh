@@ -90,9 +90,10 @@ done
 /bin/echo "Ok!"
 
 /bin/echo -n "Adding vulture project repositories..."
+/bin/mkdir -p ${TARGET}/usr/share/keys/pkg/trusted/
 /bin/cp /usr/share/keys/pkg/trusted/pkg.vultureproject.org ${TARGET}/usr/share/keys/pkg/trusted/
+/bin/mkdir -p ${TARGET}/usr/local/etc/pkg/repos/
 /bin/cp /usr/local/etc/pkg/repos/vulture.conf ${TARGET}/usr/local/etc/pkg/repos/
-/usr/sbin/pkg -j ${JAIL} update -f
 /bin/echo "Ok !"
 
 /bin/echo -n "Updating pkg repositories..."
@@ -109,6 +110,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 
+/usr/sbin/pkg -j ${JAIL} update -f
 /usr/sbin/pkg -j ${JAIL} install -y py37-virtualenv || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
