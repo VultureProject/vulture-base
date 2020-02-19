@@ -89,8 +89,14 @@ done
 
 /bin/echo "Ok!"
 
+/bin/echo -n "Adding vulture project repositories..."
+/bin/cp /usr/share/keys/pkg/trusted/pkg.vultureproject.org ${TARGET}/usr/share/keys/pkg/trusted/
+/bin/cp /usr/local/etc/pkg/repos/vulture.conf ${TARGET}/usr/local/etc/pkg/repos/
+/usr/sbin/pkg -j ${JAIL} update -f
+/bin/echo "Ok !"
+
 /bin/echo -n "Updating pkg repositories..."
-/bin/cp /var/db/pkg/repo-FreeBSD.sqlite ${TARGET}/var/db/pkg/
+/bin/cp /var/db/pkg/repo-HardenedBSD.sqlite ${TARGET}/var/db/pkg/
 /bin/echo "Ok !"
 
 # Start jail
