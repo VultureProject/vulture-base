@@ -89,13 +89,6 @@ done
 
 /bin/echo "Ok!"
 
-/bin/echo -n "Adding vulture project repositories..."
-/bin/mkdir -p ${TARGET}/usr/share/keys/pkg/trusted/
-/bin/cp /usr/share/keys/pkg/trusted/pkg.vultureproject.org ${TARGET}/usr/share/keys/pkg/trusted/
-/bin/mkdir -p ${TARGET}/usr/local/etc/pkg/repos/
-/bin/cp /usr/local/etc/pkg/repos/vulture.conf ${TARGET}/usr/local/etc/pkg/repos/
-/bin/echo "Ok !"
-
 /bin/echo -n "Updating pkg repositories..."
 /bin/cp /var/db/pkg/repo-HardenedBSD.sqlite ${TARGET}/var/db/pkg/
 /bin/echo "Ok !"
@@ -122,11 +115,23 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y libucl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y vulture-dashboard || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y ca_root_nss || (/bin/echo "Fail !" ; exit 1)
 
 #Haproxy is needed inside the jail to test haproxy configuration (1.9.0 minimum required)
 /usr/sbin/pkg -j ${JAIL} install -y haproxy || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
+
+/bin/echo -n "Adding vulture project repositories..."
+/bin/mkdir -p ${TARGET}/usr/share/keys/pkg/trusted/
+/bin/cp /usr/share/keys/pkg/trusted/pkg.vultureproject.org ${TARGET}/usr/share/keys/pkg/trusted/
+/bin/mkdir -p ${TARGET}/usr/local/etc/pkg/repos/
+/bin/cp /usr/local/etc/pkg/repos/vulture.conf ${TARGET}/usr/local/etc/pkg/repos/
+/bin/echo "Ok !"
+
+/bin/echo -n "Installing vulture-dashboard..."
+/usr/sbin/pkg -j ${JAIL} update
+/usr/sbin/pkg -j ${JAIL} install -y vulture-dashboard || (/bin/echo "Fail !" ; exit 1)
+/bin/echo "Ok!"
 
 # Jail NEEDS to be modified after system file modification !!!
 /bin/echo -n "Syncing jail..."
