@@ -129,6 +129,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Ok !"
 
 /bin/echo -n "Installing vulture-dashboard..."
+/usr/sbin/pkg -j ${JAIL} update
 /usr/sbin/pkg -j ${JAIL} install -y vulture-dashboard || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok!"
 
