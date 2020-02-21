@@ -103,7 +103,6 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 
-/usr/sbin/pkg -j ${JAIL} update -f
 /usr/sbin/pkg -j ${JAIL} install -y py37-virtualenv || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
@@ -113,25 +112,13 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y jpeg || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y node || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y libucl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y ca_root_nss || (/bin/echo "Fail !" ; exit 1)
 
 #Haproxy is needed inside the jail to test haproxy configuration (1.9.0 minimum required)
 /usr/sbin/pkg -j ${JAIL} install -y haproxy || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
-
-/bin/echo -n "Adding vulture project repositories..."
-/bin/mkdir -p ${TARGET}/usr/share/keys/pkg/trusted/
-/bin/cp /usr/share/keys/pkg/trusted/pkg.vultureproject.org ${TARGET}/usr/share/keys/pkg/trusted/
-/bin/mkdir -p ${TARGET}/usr/local/etc/pkg/repos/
-/bin/cp /usr/local/etc/pkg/repos/vulture.conf ${TARGET}/usr/local/etc/pkg/repos/
-/bin/echo "Ok !"
-
-/bin/echo -n "Installing vulture-dashboard..."
-/usr/sbin/pkg -j ${JAIL} update
-/usr/sbin/pkg -j ${JAIL} install -y vulture-dashboard || (/bin/echo "Fail !" ; exit 1)
-/bin/echo "Ok!"
 
 # Jail NEEDS to be modified after system file modification !!!
 /bin/echo -n "Syncing jail..."
