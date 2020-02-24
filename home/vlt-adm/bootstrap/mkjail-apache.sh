@@ -104,6 +104,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Installing packages into jail... Please be patient"
 
 /usr/sbin/pkg -j ${JAIL} install -y py37-virtualenv || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y openssl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y ap24-py37-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
