@@ -32,8 +32,10 @@ status_cmd="${name}_status"
 vultured_status() {
     if [ -f $pidfile ] ; then
         echo "$name is running as pid $(/bin/cat $pidfile)".
+        exit 0
     else
         echo "$name is not running."
+        exit 1
     fi
 }
 
