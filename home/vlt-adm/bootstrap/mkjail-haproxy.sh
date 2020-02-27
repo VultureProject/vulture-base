@@ -9,8 +9,8 @@ fi
 
 JAIL="haproxy"
 TARGET="/zroot/haproxy"
-BASE="http://ftp.freebsd.org/pub/FreeBSD/releases/amd64/12.0-RELEASE/base.txz"
-SHA256="360df303fac75225416ccc0c32358333b90ebcd58e54d8a935a4e13f158d3465"
+BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
+SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
 
 
 if [ -f /etc/rc.conf.proxy ]; then
@@ -98,7 +98,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Ok!"
 
 # No need to verify if already done
-/usr/sbin/pkg -j ${JAIL} install -y jq libevent apr || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y jq libevent apr secadm secadm-kmod openssl || (/bin/echo "Fail !" ; exit 1)
 
 /bin/cp -r /home/jails.haproxy/.zfs-source/* ${TARGET}/
 

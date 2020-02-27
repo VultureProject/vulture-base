@@ -9,8 +9,8 @@ fi
 
 JAIL="mongodb"
 TARGET="/zroot/mongodb"
-BASE="http://ftp.freebsd.org/pub/FreeBSD/releases/amd64/12.0-RELEASE/base.txz"
-SHA256="360df303fac75225416ccc0c32358333b90ebcd58e54d8a935a4e13f158d3465"
+BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
+SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
 
 
 if [ -f /etc/rc.conf.proxy ]; then
@@ -90,7 +90,7 @@ fi
 /bin/echo "Ok!"
 
 /bin/echo -n "Updating pkg repositories..."
-/bin/cp /var/db/pkg/repo-FreeBSD.sqlite ${TARGET}/var/db/pkg/
+/bin/cp /var/db/pkg/repo-HardenedBSD.sqlite ${TARGET}/var/db/pkg/
 /bin/echo "Ok !"
 
 # Start jail
@@ -102,10 +102,11 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
-/usr/sbin/pkg -j ${JAIL} install -y mongodb40 || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y mongodb36 secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
 
 /bin/cp /home/jails.mongodb/config/mongodb.conf ${TARGET}/usr/local/etc/
+/bin/cp -rf /home/jails.mongodb/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
 
 /bin/mkdir ${TARGET}/var/db/pki
 /bin/mkdir -p ${TARGET}/var/sockets/mongodb/

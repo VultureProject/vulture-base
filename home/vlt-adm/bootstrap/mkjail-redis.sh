@@ -9,8 +9,8 @@ fi
 
 JAIL="redis"
 TARGET="/zroot/redis"
-BASE="http://ftp.freebsd.org/pub/FreeBSD/releases/amd64/12.0-RELEASE/base.txz"
-SHA256="360df303fac75225416ccc0c32358333b90ebcd58e54d8a935a4e13f158d3465"
+BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
+SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
 
 if [ -f /etc/rc.conf.proxy ]; then
     . /etc/rc.conf.proxy
@@ -104,7 +104,7 @@ for service in "redis" "sentinel" ; do
 done
 
 /bin/echo -n "Updating pkg repositories..."
-/bin/cp /var/db/pkg/repo-FreeBSD.sqlite ${TARGET}/var/db/pkg/
+/bin/cp /var/db/pkg/repo-HardenedBSD.sqlite ${TARGET}/var/db/pkg/
 /bin/echo "Ok !"
 
 # Start jail
@@ -117,14 +117,15 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 /usr/sbin/pkg -j ${JAIL} install -y redis  || (echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod  || (echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
 
 /bin/mkdir -p ${TARGET}/usr/local/etc/redis
 /bin/mkdir -p ${TARGET}/var/sockets/redis/
 
-/bin/mkdir -p ${TARGET}/var/db/redis/
-chown redis:redis ${TARGET}/var/db/redis/
-chmod 750 ${TARGET}/var/db/redis/
+/bin/mkdir -p ${TARGET}/var/db/vulture-redis/
+chown redis:redis ${TARGET}/var/db/vulture-redis/
+chmod 750 ${TARGET}/var/db/vulture-redis/
 
 /bin/mkdir -p ${TARGET}/var/run/redis/
 chown redis:redis ${TARGET}/var/run/redis/

@@ -18,7 +18,7 @@ echo -n "Updating system ..."
 /usr/sbin/freebsd-update --not-running-from-cron fetch install > /dev/null
 echo "ok."
 
-# If no argument or haproxy asked
+# If no argument or jail asked
 for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     if [ -z "$1" -o "$1" == "$jail" ] ; then
         echo "[-] Updating $jail ..."
@@ -49,7 +49,7 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     fi
 done
 
-# GUI
+# No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
     /usr/sbin/pkg upgrade -y "vulture-gui"
     /usr/sbin/pkg -j apache update -f
@@ -62,20 +62,32 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
 fi
 
+# If no parameter provided, upgrade vulture-base
+if [ -z "$1" ] ; then
+    echo "[-] Updating vulture-base ..."
+    /usr/sbin/pkg upgrade -y vulture-base
+
+    /home/vlt-adm/bootstrap/install-kernel.sh
+    
+    echo "[+] Vulture-base updated"
+fi
+
+
 # If no argument, or Darwin
 if [ -z "$1" -o "$1" == "darwin" ] ; then
     /usr/sbin/service darwin stop
     echo "[-] Updating darwin ..."
-    /usr/sbin/pkg upgrade -y darwin
+    if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
+        /usr/sbin/pkg upgrade -fy darwin
+    else
+        /usr/sbin/pkg upgrade -y darwin
+    fi
     echo "[+] Darwin updated, starting service"
     /usr/sbin/service darwin start
 fi
 
-# If no argument - update all, including vulture-base
+# If no argument - update all
 if [ -z "$1" ] ; then
-    echo "[-] Updating vulture-base ..."
-    /usr/sbin/pkg upgrade -y vulture-base
-    echo "[+] Vulture-base updated"
     echo "[-] Updating all packages ..."
     # First upgrade libevent & gnutls independently to prevent removing of vulture-base (don't know why...)
     /usr/sbin/pkg upgrade -y libevent
@@ -83,6 +95,9 @@ if [ -z "$1" ] ; then
     # Then, upgrade all packages
     /usr/sbin/pkg upgrade -y
     echo "[+] All packages updated"
-    /usr/sbin/service vultured restart
+    # Do not start vultured if the node is not installed
+    if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+        /usr/sbin/service vultured restart
+    fi
     /usr/sbin/service netdata restart
 fi

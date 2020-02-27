@@ -9,8 +9,8 @@ fi
 
 JAIL="apache"
 TARGET="/zroot/apache"
-BASE="http://ftp.freebsd.org/pub/FreeBSD/releases/amd64/12.0-RELEASE/base.txz"
-SHA256="360df303fac75225416ccc0c32358333b90ebcd58e54d8a935a4e13f158d3465"
+BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
+SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
 
 
 if [ -f /etc/rc.conf.proxy ]; then
@@ -90,7 +90,7 @@ done
 /bin/echo "Ok!"
 
 /bin/echo -n "Updating pkg repositories..."
-/bin/cp /var/db/pkg/repo-FreeBSD.sqlite ${TARGET}/var/db/pkg/
+/bin/cp /var/db/pkg/repo-HardenedBSD.sqlite ${TARGET}/var/db/pkg/
 /bin/echo "Ok !"
 
 # Start jail
@@ -103,27 +103,28 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 
-/usr/sbin/pkg -j ${JAIL} install -y py36-virtualenv || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y py37-virtualenv || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y openssl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y ap24-py36-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y ap24-py37-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y acme.sh || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y openldap-client || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y jpeg || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y freeradius-client || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y openssl111 || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y liblognorm || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y node || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y libucl || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
 
 #Haproxy is needed inside the jail to test haproxy configuration (1.9.0 minimum required)
-/usr/sbin/pkg -j ${JAIL} install -y haproxy-devel || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y haproxy || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
 
 # Jail NEEDS to be modified after system file modification !!!
 /bin/echo -n "Syncing jail..."
 /usr/sbin/jail -m "${JAIL}"
 /bin/echo "Ok!"
-
 
 cp -rf /home/jails.apache/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
 
@@ -136,10 +137,10 @@ ln -s /home/jails.apache/.zfs-source/home/vlt-os/vulture_os/ /home/vlt-os/vultur
 ln -s /home/jails.apache/.zfs-source/home/vlt-os/scripts/ /home/vlt-os/scripts
 
 touch /home/vlt-os/vulture_os/vulture_os/secret_key.py
-# Stop darwin & netdata to prevent use of binary python3.6
+# Stop darwin & netdata to prevent use of binary python
 /usr/sbin/service darwin stop
 /usr/sbin/service netdata stop
-/usr/local/bin/virtualenv-3.6 /home/vlt-os/env
+/usr/local/bin/virtualenv-3.7 --no-pip --no-wheel --no-setuptools /home/vlt-os/env
 /usr/sbin/service netdata start
 /usr/sbin/service darwin start
 

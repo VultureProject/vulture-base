@@ -12,6 +12,7 @@ if [ -f /etc/rc.conf.proxy ]; then
     export ftp_proxy=${ftp_proxy}
 fi
 
+bsd_version=$(/usr/bin/uname -r | /usr/bin/cut -d '-' -f 1)
 
 ##########################################################################################
 
@@ -20,7 +21,7 @@ NB_RAM_TOTAL=`/sbin/sysctl -n hw.physmem`
 NB_RAM_GB=`/bin/expr ${NB_RAM_TOTAL} / 1024000000`
 NB_RAM=`/bin/expr ${NB_RAM_GB} - 2`
 
-VM_IMAGE="https://download.vultureproject.org/v4/12.0/release/mysoc-nexpose.img.gz"
+VM_IMAGE="https://download.vultureproject.org/v4/${bsd_version}/release/mysoc-nexpose.img.gz"
 VM_NAME="Nexpose"
 VM_TYPE="ubuntu"
 

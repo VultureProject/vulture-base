@@ -9,8 +9,8 @@ fi
 
 JAIL="rsyslog"
 TARGET="/zroot/rsyslog"
-BASE="http://ftp.freebsd.org/pub/FreeBSD/releases/amd64/12.0-RELEASE/base.txz"
-SHA256="360df303fac75225416ccc0c32358333b90ebcd58e54d8a935a4e13f158d3465"
+BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
+SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
 
 if [ -f /etc/rc.conf.proxy ]; then
     . /etc/rc.conf.proxy
@@ -95,7 +95,7 @@ echo 'rsyslogd_config="/usr/local/etc/rsyslog.conf"' >> ${TARGET}/etc/rc.conf.d/
 /bin/echo "Ok!"
 
 /bin/echo -n "Updating pkg repositories..."
-/bin/cp /var/db/pkg/repo-FreeBSD.sqlite ${TARGET}/var/db/pkg/
+/bin/cp /var/db/pkg/repo-HardenedBSD.sqlite ${TARGET}/var/db/pkg/
 /bin/echo "Ok !"
 
 # Start jail
@@ -110,7 +110,8 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 /usr/sbin/pkg -j ${JAIL} install -y librelp libfastjson libinotify liblogging curl \
-e2fsprogs-libuuid libmaxminddb hiredis openssl111 pcre icu cyrus-sasl libestr  || (/bin/echo "Fail !" ; exit 1)
+e2fsprogs-libuuid libmaxminddb hiredis openssl pcre icu cyrus-sasl libestr libgcrypt || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod
 /bin/echo "Ok !"
 
 #Security fix: We do not want the jail to have the curl command available (libcurl is needed by rsyslog)
