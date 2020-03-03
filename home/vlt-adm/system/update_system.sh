@@ -59,6 +59,7 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     /usr/sbin/freebsd-update -b "/zroot/apache" --not-running-from-cron fetch install > /dev/null
     /usr/sbin/freebsd-update -b "/zroot/portal" --not-running-from-cron fetch install > /dev/null
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
+    /usr/sbin/jexec apache /usr/sbin/service dashboard restart
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
 fi
 
