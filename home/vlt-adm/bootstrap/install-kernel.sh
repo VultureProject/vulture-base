@@ -38,12 +38,3 @@ sysctl kern.geom.confdot | sed -n 's/^.*hexagon,label="\([^\]*\)\\n\([^\]*\).*/\
 DISKSLICE=`cat /tmp/DISKSLICE_$$`
 echo "Install Vulture-OS bootcode on ${DISKSLICE}"
 gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ${DISKSLICE}
-
-# Restart secadm to load new rules
-/usr/sbin/service secadm restart
-
-# Deploy secadm config in jails that need exceptions
-cp /usr/local/etc/secadm-apache.rules /zroot/apache/usr/local/etc/secadm.rules
-
-# Restart secadm in jails that need exceptions
-jexec apache service secadm restart
