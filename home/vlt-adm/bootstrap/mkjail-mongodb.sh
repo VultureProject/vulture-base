@@ -140,6 +140,9 @@ fi
 #Cleanup
 rm -f /zroot/*/var/cache/pkg/*
 
+# Enabling secadm
+jexec ${JAIL} sysrc secadm_enable=YES
+jexec ${JAIL} service secadm start
 
 #Crontab is not used - disable it
 #Note: We can't disable it sooner in mkjail, otherwise jail won't start
