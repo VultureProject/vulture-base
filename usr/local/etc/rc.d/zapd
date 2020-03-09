@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+#
+
+# PROVIDE: zapd
+# REQUIRE: NETWORK
+# BEFORE:  securelevel
+# KEYWORD: shutdown
+
+# Add the following line to /etc/rc.conf to enable `zapd':
+#
+# zapd_enable="YES"
+#
+
+. /etc/rc.subr
+
+name="zapd"
+rcvar=zapd_enable
+
+load_rc_config $name
+
+: ${zapd_enable="NO"}
+
+zapd_user="vlt-os"
+pidfile="/var/run/vulture/zapd.pid"
+procname="java"
+command="/usr/sbin/daemon"
+command_args="-f -p ${pidfile} /usr/local/zap/zap.sh -daemon -dir /usr/local/zap/HOME -host 127.0.0.1 -port 8081"
+
+run_rc_command "$1"
