@@ -111,6 +111,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y openssl || (/bin/echo "Fail !" ; exit 1)
 
 # Jail NEEDS to be modified after system file modification !!!
 /bin/echo -n "Syncing jail..."
@@ -191,6 +192,10 @@ done
 
 #Cleanup
 rm -f /zroot/*/var/cache/pkg/*
+
+# Enabling secadm
+jexec ${JAIL} sysrc secadm_enable=YES
+jexec ${JAIL} service secadm start
 
 #Crontab is not used - disable it
 #Note: We can't disable it sooner in mkjail, otherwise jail won't start
