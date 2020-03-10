@@ -125,6 +125,7 @@ e2fsprogs-libuuid libmaxminddb hiredis openssl pcre icu cyrus-sasl libestr libgc
 /bin/mkdir -p ${TARGET}/var/log/pf
 /bin/mkdir -p ${TARGET}/var/db/darwin
 /bin/mkdir -p ${TARGET}/var/log/darwin
+/bin/mkdir -p ${TARGET}/var/log/api_parser
 /bin/mkdir -p ${TARGET}/var/db/reputation_ctx
 /bin/mkdir -p /usr/local/etc/rsyslog.d/
 /bin/mkdir -p /var/sockets/rsyslog/
@@ -145,6 +146,7 @@ file="/etc/fstab"
 for mount_path in "/usr/local/etc/rsyslog.d ${TARGET}/usr/local/etc/rsyslog.d" \
 "/var/db/pki ${TARGET}/var/db/pki" \
 "/var/log/pf ${TARGET}/var/log/pf" \
+"/var/log/api_parser ${TARGET}/var/log/api_parser" \
 "/var/db/darwin ${TARGET}/var/db/darwin" \
 "/var/sockets/darwin ${TARGET}/var/sockets/darwin" \
 "/var/log/darwin ${TARGET}/var/log/darwin" \
