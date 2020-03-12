@@ -1,6 +1,0 @@
-#!/bin/sh
-#
-# This file is part of VultureOS
-#
-
-/usr/local/sbin/logrotate -f /usr/local/etc/logrotate.conf

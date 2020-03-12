@@ -1,0 +1,7 @@
+# VultureOS: 2020-03-11 13:00:00Z$
+#
+SHELL=/bin/sh
+PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin
+
+# See crontab(5) for field format.
+1	*	*	*	*	root	/usr/local/sbin/logrotate /usr/local/etc/logrotate.conf
