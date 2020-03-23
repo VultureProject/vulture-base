@@ -10,23 +10,23 @@ Using this menu, you have the following choices :
  - **Password** : Change vlt-adm password,
  - **Geli Change** : Change the ZFS disk encryption password,
  - **Email** : Define the administration SMTP Email address,
- - **Management** : Modify current management IP used to bind services,
- - **Proxy** : Configure proxy,
  - **Netconfig** : Manage network configuration, like during installation of FreeBSD,
+ - **Proxy** : Configure proxy,
+ - **Management** : Modify current management IP used to bind services,
  - **Hostname** : Configure hostname,
  - **Shell** : Launch a CSH shell as vlt-adm,
  - **RootShell** : Launch a CSH shell as root,
  - **Update OS** : Update system and jails, with pkg and freebsd-update,
  - **Exit** : Exit admin menu.
 
-**It is mandatory to, at least, configure the hostname before bootstraping Vulture**
+**You should, at least, ensure the system time and management IP are correct (or update/change them) and configure the hostname (in this order) before bootstraping Vulture**
 
 
 ## Bootstraping Vulture 4
 
 Depending on what you want do to, you have 2 scripts available : 
  - `/home/vlt-adm/gui/cluster_create.sh` : To create a new **Master** node
- - `/home/vlt-adm/gui/cluster_join.sh` : To create a **slave** and join a Cluster
+ - `/home/vlt-adm/gui/cluster_join.sh` : To create a **Slave** and join a Cluster
 
 The first script, to create a new Master, has the following usage : 
 
