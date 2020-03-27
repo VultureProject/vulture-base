@@ -13,22 +13,43 @@ if [ -f /etc/rc.conf.proxy ]; then
     export ftp_proxy=${ftp_proxy}
 fi
 
+# Create temporary directory for hbsd-update artifacts
+temp_dir=$(mktemp -d)
+is_hbsd=$(freebsd-version -r | grep -c "HBSD")
+if [ $is_hbsd -ge 1 ]; then
+    echo "HardenedBSD system detected, will update system using hbsd-update"
+else
+    echo "FreeBSD system detected, will update system using freebsd-update"
+fi
+
 IGNORE_OSVERSION="yes" /usr/sbin/pkg update -f
-echo -n "Updating system ..."
-/usr/sbin/freebsd-update --not-running-from-cron fetch install > /dev/null
-echo "ok."
+echo "Updating system..."
+if [ $is_hbsd -ge 1 ]; then
+    # Store (-t) and keep (-T) downloads to $temp_dir for later use in jails
+    # -d -> disable DNSSEC version check
+    /usr/sbin/hbsd-update -d -t $temp_dir -T > /dev/null
+else
+    /usr/sbin/freebsd-update --not-running-from-cron fetch install > /dev/null
+fi
+echo "Ok."
 
 # If no argument or jail asked
 for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     if [ -z "$1" -o "$1" == "$jail" ] ; then
-        echo "[-] Updating $jail ..."
+        echo "[-] Updating $jail..."
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" update -f
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y
         # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail"
-        echo -n "[-] Updating jail base system files ..."
-        /usr/sbin/freebsd-update -b "/zroot/$jail" --not-running-from-cron fetch install > /dev/null
-        echo "ok."
+        echo "[-] Updating jail base system files..."
+        if [ $is_hbsd -ge 1 ]; then
+            # Reuse $temp_dir (-D) for jails upgrade
+            # -d -> disable DNSSEC version check
+            /usr/sbin/hbsd-update -d -j $jail -t $temp_dir -TD > /dev/null
+        else
+            /usr/sbin/freebsd-update -b "/zroot/$jail" --not-running-from-cron fetch install > /dev/null
+        fi
+        echo "Ok."
         case "$jail" in
             rsyslog)
                 /usr/sbin/jexec "$jail" /usr/sbin/service rsyslogd restart
@@ -51,15 +72,26 @@ done
 
 # No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
+    echo "[-] Updating gui..."
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-gui"
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal upgrade -y
-    /usr/sbin/freebsd-update -b "/zroot/apache" --not-running-from-cron fetch install > /dev/null
-    /usr/sbin/freebsd-update -b "/zroot/portal" --not-running-from-cron fetch install > /dev/null
+    echo "[-] Updating jail base system files..."
+    if [ $is_hbsd -ge 1 ]; then
+        # Reuse $temp_dir (-D) for jails upgrade
+        # -d -> disable DNSSEC version checks
+        /usr/sbin/hbsd-update -d -j apache -t $temp_dir -TD > /dev/null
+        /usr/sbin/hbsd-update -d -j portail -t $temp_dir -TD > /dev/null
+    else
+        /usr/sbin/freebsd-update -b "/zroot/apache" --not-running-from-cron fetch install > /dev/null
+        /usr/sbin/freebsd-update -b "/zroot/portal" --not-running-from-cron fetch install > /dev/null
+    fi
+    echo "Ok."
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
+    echo "[+] gui updated."
 fi
 
 # No parameter, of dashboard
@@ -82,7 +114,7 @@ fi
 # If no argument, or Darwin
 if [ -z "$1" -o "$1" == "darwin" ] ; then
     /usr/sbin/service darwin stop
-    echo "[-] Updating darwin ..."
+    echo "[-] Updating darwin..."
     if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin
     else
@@ -94,7 +126,7 @@ fi
 
 # If no argument - update all
 if [ -z "$1" ] ; then
-    echo "[-] Updating all packages ..."
+    echo "[-] Updating all packages..."
     # First upgrade libevent & gnutls independently to prevent removing of vulture-base (don't know why...)
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y libevent
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y gnutls
@@ -108,3 +140,6 @@ if [ -z "$1" ] ; then
     fi
     /usr/sbin/service netdata restart
 fi
+
+# Remove temporary folder for system updates
+/bin/rm -rf $temp_dir
