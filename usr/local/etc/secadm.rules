@@ -6,6 +6,12 @@ secadm {
 		prefer_acl: true
 	},
     pax {
+		path: "/usr/local/bin/python3.7",
+		mprotect: false,
+		pageexec: false,
+		prefer_acl: true
+	},
+    pax {
         path: "/usr/local/bootstrap-openjdk11/bin/java",
         mprotect: false,
         pageexec: false,
