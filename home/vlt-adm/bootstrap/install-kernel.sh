@@ -38,3 +38,6 @@ sysctl kern.geom.confdot | sed -n 's/^.*hexagon,label="\([^\]*\)\\n\([^\]*\).*/\
 DISKSLICE=`cat /tmp/DISKSLICE_$$`
 echo "Install Vulture-OS bootcode on ${DISKSLICE}"
 gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ${DISKSLICE}
+
+# Restart secadm after rules update
+/usr/sbin/service secadm restart
