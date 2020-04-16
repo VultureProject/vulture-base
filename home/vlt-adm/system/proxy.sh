@@ -15,6 +15,10 @@ if [ "${proxy}" != "" ]; then
     /bin/echo "http_proxy=http://${proxy}" > /etc/rc.conf.proxy
     /bin/echo "https_proxy=http://${proxy}" >> /etc/rc.conf.proxy
     /bin/echo "ftp_proxy=http://${proxy}" >> /etc/rc.conf.proxy
+    # Copy proxy conf to jails
+    for dir in /zroot/*/etc/ ; do /bin/cp /etc/rc.conf.proxy "$dir" ; done
 else
     /bin/rm /etc/rc.conf.proxy
+    # Remove proxy from jails
+    /bin/rm /zroot/*/etc/rc.conf.proxy
 fi
