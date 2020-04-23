@@ -34,6 +34,10 @@ ip="$(/bin/cat /usr/local/etc/management.ip)"
 /bin/echo "${ip} ${hostname}" >> /etc/hosts
 /bin/echo "${hostname}" > /etc/host-hostname
 
+# Set hostname=127.0.0.2 into MongoDB jail - it can then resolve himself
+/bin/cp /etc/hosts /zroot/mongodb/etc/hosts
+/usr/bin/sed -i '' "s/$ip/127.0.0.2/" /zroot/mongodb/etc/hosts
+
 #Copy hosts file to jails
 for jail in apache mongodb redis rsyslog haproxy portal; do
     /bin/cp /usr/local/etc/management.ip /zroot/${jail}/usr/local/etc/management.ip
