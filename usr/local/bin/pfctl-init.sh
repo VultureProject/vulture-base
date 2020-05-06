@@ -73,6 +73,12 @@ ${REMOTE_TO_JAIL}
 
 # Generic directives
 pass quick on lo0 all
+pass quick on lo1 all
+pass quick on lo2 all
+pass quick on lo3 all
+pass quick on lo4 all
+pass quick on lo5 all
+pass quick on lo6 all
 block in log all
 #pass in proto icmp6 all
 #pass out proto icmp6 all

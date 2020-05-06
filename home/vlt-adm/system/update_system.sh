@@ -23,6 +23,12 @@ update_system() {
         if [ -n "$jail" ] ; then options="-D -j $jail" ; fi
         # Store (-t) and keep (-T) downloads to $temp_dir for later use
         /usr/sbin/hbsd-update -t "$temp_dir" -T $options > /dev/null
+        # Restart secadm service after updating Hardened kernel
+        if [ -n "$jail" ] ; then 
+            /usr/sbin/jexec $jail /usr/sbin/service secadm restart
+        else
+            /usr/sbin/service secadm restart
+        fi
     else
         # If jail, just install do not fetch
         if [ -n "$jail" ] ; then options="-b /zroot/$jail" ; else option="fetch" ; fi
