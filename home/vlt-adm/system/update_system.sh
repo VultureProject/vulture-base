@@ -22,7 +22,7 @@ update_system() {
         # If jail specified, do not download (use cache)
         if [ -n "$jail" ] ; then options="-D -j $jail" ; fi
         # Store (-t) and keep (-T) downloads to $temp_dir for later use
-        /usr/sbin/hbsd-update -t "$temp_dir" -T $options > /dev/null
+        /usr/sbin/hbsd-update -t "$temp_dir" -T $options
         # Restart secadm service after updating Hardened kernel
         if [ -n "$jail" ] ; then 
             /usr/sbin/jexec $jail /usr/sbin/service secadm restart
