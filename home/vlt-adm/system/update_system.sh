@@ -14,17 +14,30 @@ if [ -f /etc/rc.conf.proxy ]; then
 fi
 
 
+restart_secadm() {
+    jail="$1"
+    if [ -f /usr/sbin/hbsd-update ] ; then
+        /usr/sbin/pkg -j $jail install -y secadm
+        /usr/sbin/jexec $jail /usr/sbin/service secadm restart
+    fi
+}
+
+
 # Function used to use appropriate update binary
 update_system() {
     temp_dir="$1"
     jail="$2"
     if [ -f /usr/sbin/hbsd-update ] ; then
         # If jail specified, do not download (use cache)
-        if [ -n "$jail" ] ; then options="-D -j $jail" ; fi
+        if [ -n "$jail" ] ; then options="-j $jail" ; fi
         # Store (-t) and keep (-T) downloads to $temp_dir for later use
-        /usr/sbin/hbsd-update -t "$temp_dir" -T $options > /dev/null
+        # Firstly try to extract previous download
+        /usr/sbin/hbsd-update -t "$temp_dir" -T -D $options
+        # If command failed, download the archive
+        if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         # Restart secadm service after updating Hardened kernel
         if [ -n "$jail" ] ; then 
+	    /usr/sbin/pkg -j $jail install -y secadm
             /usr/sbin/jexec $jail /usr/sbin/service secadm restart
         else
             /usr/sbin/service secadm restart
@@ -49,12 +62,14 @@ echo "Ok."
 for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     if [ -z "$1" -o "$1" == "$jail" ] ; then
         echo "[-] Updating $jail..."
+        echo "[-] Updating jail $jail base system files..."
+        update_system "$temp_dir" "$jail"
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" update -f
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y
         # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail"
-        echo "[-] Updating jail base system files..."
-        update_system "$temp_dir" "$jail"
+	# Restart secadm after pkg upgrade, to reload new rules
+	restart_secadm "$jail"
         echo "Ok."
         case "$jail" in
             rsyslog)
