@@ -17,7 +17,7 @@ fi
 restart_secadm() {
     jail="$1"
     if [ -f /usr/sbin/hbsd-update ] ; then
-        /usr/sbin/pkg -j $jail install -y secadm
+        /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
         /usr/sbin/jexec $jail /usr/sbin/service secadm restart
     fi
 }
@@ -37,7 +37,7 @@ update_system() {
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         # Restart secadm service after updating Hardened kernel
         if [ -n "$jail" ] ; then 
-	    /usr/sbin/pkg -j $jail install -y secadm
+	    /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
             /usr/sbin/jexec $jail /usr/sbin/service secadm restart
         else
             /usr/sbin/service secadm restart
