@@ -17,7 +17,6 @@ fi
 restart_secadm() {
     jail="$1"
     if [ -f /usr/sbin/hbsd-update ] ; then
-        /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
         /usr/sbin/jexec $jail /usr/sbin/service secadm restart
     fi
 }
@@ -68,8 +67,8 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y
         # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail"
-	# Restart secadm after pkg upgrade, to reload new rules
-	restart_secadm "$jail"
+	    # Restart secadm after pkg upgrade, to reload new rules
+	    restart_secadm "$jail"
         echo "Ok."
         case "$jail" in
             rsyslog)
@@ -82,6 +81,16 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
                 /usr/sbin/jexec "$jail" /usr/sbin/service sentinel stop
                 /usr/sbin/jexec "$jail" /usr/sbin/service redis restart
                 /usr/sbin/jexec "$jail" /usr/sbin/service sentinel start
+                ;;
+            haproxy)
+                # Stop gracefully
+                /usr/sbin/jexec "$jail" /usr/sbin/service haproxy stop &
+                # Wait for haproxy to stop
+                /bin/sleep 5
+                # Force stop if gracefull stop waiting
+                /usr/sbin/jexec "$jail" /usr/sbin/service haproxy status && /usr/sbin/jexec "$jail" /usr/sbin/service haproxy hardstop
+                # Then start
+                /usr/sbin/jexec "$jail" /usr/sbin/service haproxy start
                 ;;
             *)
                 /usr/sbin/jexec "$jail" /usr/sbin/service "$jail" restart
