@@ -22,7 +22,7 @@ base_url="https://download.vultureproject.org/v4/${bsd_version}/kernel/${KERNEL}
 /usr/local/bin/wget "$base_url-latest.txz" -O /var/tmp/${KERNEL}.txz
 /usr/local/bin/wget "$base_url-latest.sha256sum" -O /var/tmp/${KERNEL}.sha256sum
 /bin/echo -n "Verifying SHASUM for ${KERNEL}.txz... "
-/sbin/sha256 -c /var/tmp/${KERNEL}.sha256sum > /dev/null
+/sbin/sha256 -c `cat /var/tmp/${KERNEL}.sha256sum | cut -d ' ' -f 1` /var/tmp/${KERNEL}.sha256sum > /dev/null
 if [ "$?" == "0" ]; then
     /bin/echo "Ok!"
 else
