@@ -34,6 +34,7 @@ update_system() {
         /usr/sbin/hbsd-update -t "$temp_dir" -T -D $options
         # If command failed, download the archive
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
+        if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
         # Restart secadm service after updating Hardened kernel
         if [ -n "$jail" ] ; then 
 	    /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
