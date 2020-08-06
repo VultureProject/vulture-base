@@ -12,7 +12,7 @@ nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00
 nat pass proto tcp from fd00::206 to any port 443 -> ${management_ip}  # vultureproject.org
 nat pass proto tcp from fd00::206 to ${management_ip} port { 1978,4200,6379,8000,9091,19999 } -> ${management_ip}  # Haproxy, hellInaBox, Redis, AdminGUI, Mongodb, Netdata
 nat pass proto tcp from fd00::207 to ${management_ip} port { 6379,9091 } -> ${management_ip}  # Redis, Mongodb
-nat pass proto tcp from fd00::202 to any port 9091 -> ${management_ip}  # Mongodb
+nat pass proto tcp from fd00::202 to !fd00::202 port 9091 -> ${management_ip}  # Mongodb
 nat pass proto tcp from fd00::203 to any port 6379 -> ${management_ip}  # Redis
 nat pass proto tcp from fd00::203 to any port 26379 -> ${management_ip}  # Sentinel
 nat pass proto tcp from fd00::204 to ${management_ip} port 9091 -> ${management_ip}  # Rsyslog -> Mongodb
@@ -34,7 +34,7 @@ nat pass proto tcp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.
 nat pass proto tcp from 127.0.0.6 to any port 443 -> ${management_ip}  # Apache jail -> vultureproject.org
 nat pass proto tcp from 127.0.0.6 to any port { 1978,4200,6379,8000,9091,19999 } -> ${management_ip}   # Haproxy, ShellInaBox, Redis, AdminGUI, Mongodb, Netdata
 nat pass proto tcp from 127.0.0.7 to ${management_ip} port { 6379,9091 } -> ${management_ip}   # Redis, Mongodb
-nat pass proto tcp from 127.0.0.2 to any port 9091 -> ${management_ip}  # Mongodb
+nat pass proto tcp from 127.0.0.2 to !127.0.0.2 port 9091 -> ${management_ip}  # Mongodb
 nat pass proto tcp from 127.0.0.3 to any port 6379 -> ${management_ip}  # Redis
 nat pass proto tcp from 127.0.0.3 to any port 26379 -> ${management_ip}  # Sentinel
 nat pass proto tcp from 127.0.0.4 to ${management_ip} port 9091 -> ${management_ip}  # Rsyslog -> Mongodb
