@@ -162,7 +162,6 @@ if [ -z "$1" ] ; then
         /usr/sbin/service vultured restart
         
     fi
-    /usr/sbin/service netdata restart
 fi
 
 # Remove temporary folder for system updates

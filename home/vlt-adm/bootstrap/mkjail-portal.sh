@@ -141,11 +141,9 @@ touch /home/vlt-os/vulture_os/vulture_os/secret_key.py
 
 # Check if env already exists !!!!
 
-# Stop darwin & netdata to prevent use of binary python
+# Stop darwin to prevent use of binary python
 /usr/sbin/service darwin stop
-/usr/sbin/service netdata stop
 /usr/local/bin/virtualenv-3.7 --no-pip --no-wheel --no-setuptools /home/vlt-os/env
-/usr/sbin/service netdata start
 /usr/sbin/service darwin start
 
 # Map Vulture-GUI to the Apache JAIL (done via fstab below)

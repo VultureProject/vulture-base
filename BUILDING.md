@@ -42,7 +42,6 @@ Then, **install** required **packages** : <br>
 `pkg install -y vulture-mongodb` <br>
 `pkg install -y vulture-redis` <br>
 `pkg install -y vulture-gui` <br>
-`pkg install -y netdata` <br>
 `pkg install -y vulture-base` <br>
 `pkg install -y darwin` <br>
 

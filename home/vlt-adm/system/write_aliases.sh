@@ -26,12 +26,5 @@ else
     sed -i '' -E "s/^vlt-os:.*/vlt-os: ${1}/" /etc/mail/aliases
 fi
 
-grep "^netdata:" /etc/mail/aliases > /dev/null
-if [ "$?" == "1" ];then
-    echo "netdata: ${1}" >> /etc/mail/aliases
-else
-    sed -i '' -E "s/^netdata:.*/netdata: ${1}/" /etc/mail/aliases
-fi
-
 /usr/bin/newaliases
 postalias /etc/aliases
