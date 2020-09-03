@@ -42,7 +42,6 @@ Then, **install** required **packages** : <br>
 `pkg install -y vulture-mongodb` <br>
 `pkg install -y vulture-redis` <br>
 `pkg install -y vulture-gui` <br>
-`pkg install -y netdata` <br>
 `pkg install -y vulture-base` <br>
 `pkg install -y darwin` <br>
 
@@ -55,9 +54,6 @@ Then, **bootstrap** all the required **system jails** : <br>
 `/home/vlt-adm/bootstrap/mkjail-apache.sh` <br>
 `/home/vlt-adm/bootstrap/mkjail-portal.sh` <br>
 `/home/vlt-adm/bootstrap/mkjail-rsyslog.sh` <br>
-
-You may want to install **vulture-dashboard** to get detailed information about Rsysog and Darwin (queue sizes, number of parsed messages, number of alerts...): <br>
-`pkg install -y vulture-dashboard` <br>
 
 Finally, activate **secadm** in jails: <br>
 `jexec haproxy sysrc secadm_enable=YES`<br>
