@@ -26,9 +26,6 @@ restart_secadm() {
 temp_dir="$(mktemp -d)"
 
 IGNORE_OSVERSION="yes" /usr/sbin/pkg update -f
-echo "Updating system..."
-update_system "$temp_dir"
-echo "Ok."
 
 # If no argument or jail asked
 for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
@@ -79,10 +76,6 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal upgrade -y
-    echo "[-] Updating jail base system files..."
-    update_system "$temp_dir" "apache"
-    update_system "$temp_dir" "portal"
-    echo "Ok."
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
     echo "[+] gui updated."
