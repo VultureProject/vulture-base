@@ -61,9 +61,6 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
         /usr/sbin/jexec apache /usr/sbin/service apache24 restart
         /usr/sbin/jexec portal /usr/sbin/service apache24 restart
 
-        # Netdata is restarted
-        /usr/sbin/service netdata restart
-
         # MongoDB is restarted "as this"
         if ! /usr/sbin/jexec mongodb /usr/sbin/service mongod restart ; then
             /bin/echo "[!] Failed to restart mongodb. Please solve and relaunch $0." > /dev/stderr

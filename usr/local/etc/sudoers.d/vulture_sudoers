@@ -7,11 +7,6 @@ vlt-os ALL=NOPASSWD:/usr/sbin/service mongod stop
 vlt-os ALL=NOPASSWD:/usr/sbin/service mongod restart
 vlt-os ALL=NOPASSWD:/usr/sbin/service mongod onestatus
 
-vlt-os ALL=NOPASSWD:/usr/sbin/service netdata start
-vlt-os ALL=NOPASSWD:/usr/sbin/service netdata stop
-vlt-os ALL=NOPASSWD:/usr/sbin/service netdata restart
-vlt-os ALL=NOPASSWD:/usr/sbin/service netdata onestatus
-
 vlt-os ALL=NOPASSWD:/usr/sbin/service routing restart
 
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec redis /usr/sbin/service redis onestatus

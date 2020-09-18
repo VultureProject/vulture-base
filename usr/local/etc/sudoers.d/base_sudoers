@@ -27,7 +27,6 @@ vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-apache.sh
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail start
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail stop
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail restart
-vlt-adm ALL=NOPASSWD:/usr/sbin/service netdata restart
 vlt-adm ALL=NOPASSWD:/usr/sbin/service netif restart
 vlt-adm ALL=NOPASSWD:/usr/sbin/service routing restart
 

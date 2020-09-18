@@ -34,6 +34,7 @@ update_system() {
         /usr/sbin/hbsd-update -t "$temp_dir" -T -D $options
         # If command failed, download the archive
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
+        if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
         # Restart secadm service after updating Hardened kernel
         if [ -n "$jail" ] ; then 
 	    /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
@@ -117,12 +118,6 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[+] gui updated."
 fi
 
-# No parameter, of dashboard
-if [ -z "$1" -o "$1" == "dashboard" ] ; then
-    /usr/sbin/pkg upgrade -y "vulture-dashboard" || /bin/echo "vulture-dashboard not installed. skipping..."
-    /usr/sbin/jexec apache /usr/sbin/service dashboard restart || /bin/echo "service dashboard not found. skipping..."
-fi
-
 # If no parameter provided, upgrade vulture-base
 if [ -z "$1" ] ; then
     echo "[-] Updating vulture-base ..."
@@ -161,7 +156,6 @@ if [ -z "$1" ] ; then
         /usr/sbin/service vultured restart
         
     fi
-    /usr/sbin/service netdata restart
 fi
 
 # Remove temporary folder for system updates

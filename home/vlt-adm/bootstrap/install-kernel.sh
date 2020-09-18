@@ -22,7 +22,7 @@ base_url="https://download.vultureproject.org/v4/${bsd_version}/kernel/${KERNEL}
 /usr/local/bin/wget "$base_url-latest.txz" -O /var/tmp/${KERNEL}.txz
 /usr/local/bin/wget "$base_url-latest.sha256sum" -O /var/tmp/${KERNEL}.sha256sum
 /bin/echo -n "Verifying SHASUM for ${KERNEL}.txz... "
-/sbin/sha256 -c /var/tmp/${KERNEL}.sha256sum > /dev/null
+/sbin/sha256 -c `cat /var/tmp/${KERNEL}.sha256sum | cut -d ' ' -f 1` /var/tmp/${KERNEL}.sha256sum > /dev/null
 if [ "$?" == "0" ]; then
     /bin/echo "Ok!"
 else
@@ -33,11 +33,16 @@ fi
 /usr/bin/tar xvf /var/tmp/${KERNEL}.txz -C /
 /bin/rm -f /var/tmp/${KERNEL}.txz
 
-# Update GPTZFSBoot with latest image
-sysctl kern.geom.confdot | sed -n 's/^.*hexagon,label="\([^\]*\)\\n\([^\]*\).*/\1 \2/p' | grep '0 .*' |sed 's/ .*//' |grep -v '^cd'|grep -v '^gpt' > /tmp/DISKSLICE_$$
-DISKSLICE=`cat /tmp/DISKSLICE_$$`
-echo "Install Vulture-OS bootcode on ${DISKSLICE}"
-gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ${DISKSLICE}
+
+# Don't install mbr if disk is not using encryption as it will break EFI system
+geli list | grep 'p3\.eli' 2> /dev/null
+if [ "$?" == "0" ]; then
+    # Update GPTZFSBoot with latest image
+    sysctl kern.geom.confdot | sed -n 's/^.*hexagon,label="\([^\]*\)\\n\([^\]*\).*/\1 \2/p' | grep '0 .*' |sed 's/ .*//' |grep -v '^cd'|grep -v '^gpt' > /tmp/DISKSLICE_$$
+    DISKSLICE=`cat /tmp/DISKSLICE_$$`
+    echo "Install Vulture-OS bootcode on ${DISKSLICE}"
+    gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ${DISKSLICE}
+fi
 
 # Restart secadm after rules update
 /usr/sbin/service secadm restart
