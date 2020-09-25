@@ -92,8 +92,6 @@ if [ -z "$1" ] ; then
     echo "[-] Updating vulture-base ..."
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base
 
-    /home/vlt-adm/bootstrap/install-kernel.sh
-    
     echo "[+] Vulture-base updated"
 fi
 

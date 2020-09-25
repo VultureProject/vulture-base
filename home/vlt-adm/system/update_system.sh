@@ -35,7 +35,7 @@ update_system() {
         # If command failed, download the archive
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
-        # Restart secadm service after updating Hardened kernel
+        # Restart secadm service after updating kernel
         if [ -n "$jail" ] ; then 
 	    /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
             /usr/sbin/jexec $jail /usr/sbin/service secadm restart
@@ -123,8 +123,6 @@ if [ -z "$1" ] ; then
     echo "[-] Updating vulture-base ..."
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base
 
-    /home/vlt-adm/bootstrap/install-kernel.sh
-    
     echo "[+] Vulture-base updated"
 fi
 
