@@ -13,7 +13,6 @@ vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/hostname.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/netconfig.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/netconfig-resolv.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/management.sh
-vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/masquerading.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/update_system.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/keymap.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/geli-passphrase.sh
