@@ -1,55 +1,49 @@
 #!/bin/sh
 
-#This script restores a default configuration for PF
+# This script restores a default configuration for PF
 management_ip="$(/bin/cat /usr/local/etc/management.ip)"
+masquerading_ip="$(/bin/cat /usr/local/etc/masquerading.ip)"
 
 grep ':' /usr/local/etc/management.ip > /dev/null
-#IPV6 Management address
+# IPV6 Management address
 if [ "$?" == "0" ]; then
-    MASQUERADING="nat pass proto udp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 53 -> ${management_ip}  # jails -> DNS
-nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 80 -> ${management_ip}  # jails -> HTTP
-nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 3128 -> ${management_ip}  # jails -> Proxy
-nat pass proto tcp from fd00::206 to any port 443 -> ${management_ip}  # vultureproject.org
-nat pass proto tcp from fd00::206 to ${management_ip} port { 1978,6379,8000,9091 } -> ${management_ip}  # Haproxy, Redis, AdminGUI, Mongodb
-nat pass proto tcp from fd00::207 to ${management_ip} port { 6379,9091 } -> ${management_ip}  # Redis, Mongodb
-nat pass proto tcp from fd00::202 to !fd00::202 port 9091 -> ${management_ip}  # Mongodb
-nat pass proto tcp from fd00::203 to any port 6379 -> ${management_ip}  # Redis
-nat pass proto tcp from fd00::203 to any port 26379 -> ${management_ip}  # Sentinel
-nat pass proto tcp from fd00::204 to ${management_ip} port 9091 -> ${management_ip}  # Rsyslog -> Mongodb
-"
-    LOCAL_TO_JAIL="rdr pass proto tcp from ${management_ip} to ${management_ip} port 8000 -> fd00::206
-rdr pass proto tcp from ${management_ip} to ${management_ip} port 1978 -> fd00::205
-rdr pass proto tcp from any to ${management_ip} port 9091 -> fd00::202
-rdr pass proto tcp from any to ${management_ip} port 6379 -> fd00::203
-rdr pass proto tcp from any to ${management_ip} port 26379 -> fd00::203
-"
-    REMOTE_TO_JAIL="rdr pass log proto tcp from any to ${management_ip} port { 8000 } -> fd00::206 port 8000"
-    JAIL_INTERCONNECTION="pass quick proto tcp from fd00::205 to fd00::207 port 9000"
+ JAILMANAGEMENT="fd00::20"
 else
-    MASQUERADING="nat pass proto udp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 53 -> ${management_ip}  # jails -> DNS
-nat pass proto tcp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 80 -> ${management_ip}  # jails -> HTTP
-nat pass proto tcp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 3128 -> ${management_ip}  # jails -> HTTP
-nat pass proto tcp from 127.0.0.6 to any port 443 -> ${management_ip}  # Apache jail -> vultureproject.org
-nat pass proto tcp from 127.0.0.6 to any port { 1978,6379,8000,9091 } -> ${management_ip}   # Haproxy, Redis, AdminGUI, Mongodb
-nat pass proto tcp from 127.0.0.7 to ${management_ip} port { 6379,9091 } -> ${management_ip}   # Redis, Mongodb
-nat pass proto tcp from 127.0.0.2 to !127.0.0.2 port 9091 -> ${management_ip}  # Mongodb
-nat pass proto tcp from 127.0.0.3 to any port 6379 -> ${management_ip}  # Redis
-nat pass proto tcp from 127.0.0.3 to any port 26379 -> ${management_ip}  # Sentinel
-nat pass proto tcp from 127.0.0.4 to ${management_ip} port 9091 -> ${management_ip}  # Rsyslog -> Mongodb
-"
-    LOCAL_TO_JAIL="rdr pass proto tcp from ${management_ip} to ${management_ip} port 8000 -> 127.0.0.6
-rdr pass proto tcp from ${management_ip} to ${management_ip} port 1978 -> 127.0.0.5
-rdr pass proto tcp from any to ${management_ip} port 9091 -> 127.0.0.2
-rdr pass proto tcp from any to ${management_ip} port 6379 -> 127.0.0.3
-rdr pass proto tcp from any to ${management_ip} port 26379 -> 127.0.0.3
-"
-    REMOTE_TO_JAIL="rdr pass log proto tcp from any to ${management_ip} port { 8000 } -> 127.0.0.6 port 8000
-rdr pass log proto tcp from any to ${management_ip} port { 9091 } -> 127.0.0.2 port 9091
-rdr pass log proto tcp from any to ${management_ip} port { 6379 } -> 127.0.0.3 port 6379
-rdr pass log proto tcp from any to ${management_ip} port { 26379 } -> 127.0.0.3 port 26379"
-
-    JAIL_INTERCONNECTION="pass quick proto tcp from 127.0.0.5 to 127.0.0.7 port 9000"
+ JAILMANAGEMENT="127.0.0."
 fi
+
+grep ':' /usr/local/etc/masquerading.ip > /dev/null
+# IPV6 Masquerading address
+if [ "$?" == "0" ]; then
+ JAILMASQUERADE="fd00::20"
+else
+ JAILMASQUERADE="127.0.0."
+fi
+
+
+MASQUERADING="nat pass proto udp from { ${JAILMASQUERADE}2,${JAILMASQUERADE}3,${JAILMASQUERADE}4,${JAILMASQUERADE}5,${JAILMASQUERADE}6,${JAILMASQUERADE}7 } to any port 53 -> ${masquerading_ip}  # jails -> DNS
+nat pass proto tcp from { ${JAILMASQUERADE}2,${JAILMASQUERADE}3,${JAILMASQUERADE}4,${JAILMASQUERADE}5,${JAILMASQUERADE}6,${JAILMASQUERADE}7 } to any port 80 -> ${masquerading_ip}  # jails -> HTTP
+nat pass proto tcp from { ${JAILMASQUERADE}2,${JAILMASQUERADE}3,${JAILMASQUERADE}4,${JAILMASQUERADE}5,${JAILMASQUERADE}6,${JAILMASQUERADE}7 } to any port 3128 -> ${masquerading_ip}  # jails -> Proxy
+nat pass proto tcp from ${JAILMASQUERADE}6 to any port 443 -> ${masquerading_ip}  # vultureproject.org
+nat pass proto tcp from ${JAILMANAGEMENT}6 to ${management_ip} port { 1978,6379,8000,9091 } -> ${management_ip}  # Haproxy, Redis, AdminGUI, Mongodb
+nat pass proto tcp from ${JAILMANAGEMENT}7 to ${management_ip} port { 6379,9091 } -> ${management_ip}  # Redis, Mongodb
+nat pass proto tcp from ${JAILMANAGEMENT}2 to !fd00::202 port 9091 -> ${management_ip}  # Mongodb
+nat pass proto tcp from ${JAILMANAGEMENT}3 to any port 6379 -> ${management_ip}  # Redis
+nat pass proto tcp from ${JAILMANAGEMENT}3 to any port 26379 -> ${management_ip}  # Sentinel
+nat pass proto tcp from ${JAILMANAGEMENT}4 to ${management_ip} port 9091 -> ${management_ip}  # Rsyslog -> Mongodb
+"
+LOCAL_TO_JAIL="rdr pass proto tcp from ${management_ip} to ${management_ip} port 8000 -> ${JAILMANAGEMENT}6
+rdr pass proto tcp from ${management_ip} to ${management_ip} port 1978 -> ${JAILMANAGEMENT}5
+rdr pass proto tcp from any to ${management_ip} port 9091 -> ${JAILMANAGEMENT}2
+rdr pass proto tcp from any to ${management_ip} port 6379 -> ${JAILMANAGEMENT}3
+rdr pass proto tcp from any to ${management_ip} port 26379 -> ${JAILMANAGEMENT}3
+"
+REMOTE_TO_JAIL="rdr pass log proto tcp from any to ${management_ip} port { 8000 } -> ${JAILMANAGEMENT}6 port 8000
+rdr pass log proto tcp from any to ${management_ip} port { 9091 } -> ${JAILMANAGEMENT}2 port 9091
+rdr pass log proto tcp from any to ${management_ip} port { 6379 } -> ${JAILMANAGEMENT}3 port 6379
+rdr pass log proto tcp from any to ${management_ip} port { 26379 } -> ${JAILMANAGEMENT}3 port 26379"
+JAIL_INTERCONNECTION="pass quick proto tcp from ${JAILMANAGEMENT}5 to ${JAILMANAGEMENT}7 port 9000"
+
 
 /bin/echo "# BOOTSTRAP FIREWALL CONFIG
 # THIS WILL BE ERASED BY VULTURE-OS LATER

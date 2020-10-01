@@ -36,6 +36,7 @@ do
     "geli_change" "Modify FDE password" \
     "email" "Define Email address to send alerts to" \
     "management" "Change Management IP" \
+    "masquerade" "Change Masquerading IP" \
     "proxy" "HTTP Proxy config"     \
     "netconfig" "Network config"    \
     "hostname" "Hostname config"    \
@@ -88,6 +89,28 @@ do
                         if  echo "$ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'; then
                             /usr/local/bin/sudo /home/vlt-adm/system/netconfig-resolv.sh
                     	    /usr/local/bin/sudo /home/vlt-adm/system/management.sh "${ip}"
+                        else
+                            /usr/bin/dialog --msgbox "IP format incorrect" 8 60
+                        fi
+                    fi
+                    ;;
+                "masquerade")
+                    check_jails
+
+                    /bin/rm -f "$tmp_file"
+                    if [ ! -f /usr/local/etc/masquerading.ip ]; then
+                        ip="$(/sbin/ifconfig | /usr/bin/grep inet | /usr/bin/grep -v '127.0.0.1' | /usr/bin/grep -v ' ::1 ' \
+                        | /usr/bin/grep -v 'fe80:' | /usr/bin/awk '{print $2}' | /usr/bin/awk -vRS="" -vOFS=' ' '$1=$1')"
+                    else
+                        ip="$(/bin/cat /usr/local/etc/masquerading.ip)"
+                    fi
+
+                    if /usr/bin/dialog --title "Vulture Masquerding IP" --inputbox "Choose the masquerading IP Address" 8 60 "${ip}" --stdout > "$tmp_file"; then
+                        ip="$(/bin/cat "$tmp_file")"
+                        /bin/rm "$tmp_file"
+
+                        if  echo "$ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'; then
+                    	    /usr/local/bin/sudo /home/vlt-adm/system/masquerading.sh "${ip}"
                         else
                             /usr/bin/dialog --msgbox "IP format incorrect" 8 60
                         fi
