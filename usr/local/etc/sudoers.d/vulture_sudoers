@@ -75,6 +75,7 @@ vlt-os ALL=NOPASSWD:/bin/rm /etc/rc.conf.d/netaliases*
 vlt-os ALL=NOPASSWD:/bin/rm /etc/rc.conf.d/netaliases*
 
 vlt-os ALL=NOPASSWD:/sbin/pfctl -f /usr/local/etc/pf.conf
+vlt-os ALL=NOPASSWD:/sbin/pfctl -sr
 vlt-os ALL=NOPASSWD:/usr/sbin/service pf start
 vlt-os ALL=NOPASSWD:/usr/sbin/service pf stop
 vlt-os ALL=NOPASSWD:/usr/sbin/service pf restart
