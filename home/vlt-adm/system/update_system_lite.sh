@@ -34,7 +34,9 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" update -f
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y
         # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg unlock -y "vulture-$jail"
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg lock -y "vulture-$jail"
 	    # Restart secadm after pkg upgrade, to reload new rules
 	    restart_secadm "$jail"
         echo "Ok."
@@ -71,7 +73,9 @@ done
 # No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[-] Updating gui..."
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg unlock -y "vulture-gui"
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-gui"
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg lock -y "vulture-gui"
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
@@ -90,7 +94,9 @@ fi
 # If no parameter provided, upgrade vulture-base
 if [ -z "$1" ] ; then
     echo "[-] Updating vulture-base ..."
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg unlock -y "vulture-base"
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg lock -y "vulture-base"
 
     echo "[+] Vulture-base updated"
 fi
@@ -103,7 +109,9 @@ if [ -z "$1" -o "$1" == "darwin" ] ; then
     if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin
     else
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg unlock -y "darwin"
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y darwin
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg lock -y "darwin"
     fi
     echo "[+] Darwin updated, starting service"
     /usr/sbin/service darwin start
