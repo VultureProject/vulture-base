@@ -68,6 +68,19 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     fi
 done
 
+# If no argument, or Darwin
+if [ -z "$1" -o "$1" == "darwin" ] ; then
+    /usr/sbin/service darwin stop
+    echo "[-] Updating darwin..."
+    if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin
+    else
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y darwin
+    fi
+    echo "[+] Darwin updated, starting service"
+    /usr/sbin/service darwin start
+fi
+
 # No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[-] Updating gui..."
@@ -95,19 +108,6 @@ if [ -z "$1" ] ; then
     echo "[+] Vulture-base updated"
 fi
 
-
-# If no argument, or Darwin
-if [ -z "$1" -o "$1" == "darwin" ] ; then
-    /usr/sbin/service darwin stop
-    echo "[-] Updating darwin..."
-    if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin
-    else
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y darwin
-    fi
-    echo "[+] Darwin updated, starting service"
-    /usr/sbin/service darwin start
-fi
 
 # If no argument - update all
 if [ -z "$1" ] ; then
