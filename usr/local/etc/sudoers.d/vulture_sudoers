@@ -36,6 +36,12 @@ vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd start
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd stop
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd reload
 
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat restart
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat onestatus
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat start
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat stop
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat reload
+
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan reload
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan restart
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan onestatus

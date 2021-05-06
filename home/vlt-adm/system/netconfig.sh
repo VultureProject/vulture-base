@@ -34,6 +34,10 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.net ]; then
         fi
     fi
 
+    # Remove duplicated lines
+    sysrc -f /etc/rc.conf.d/network -ae > /tmp/rc.conf.network
+    /bin/mv /tmp/rc.conf.network /etc/rc.conf.d/network
+
     /usr/sbin/service netif restart
     dhcp_list=$(/usr/bin/grep "SYNCDHCP" /etc/rc.conf.d/network | /usr/bin/sed -e 's/.*_\(.*\)="SYNCDHCP"/\1/')
     for i in ${dhcp_list}; do
