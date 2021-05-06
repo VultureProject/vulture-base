@@ -91,7 +91,7 @@ mkdir -p ${TARGET}/etc/rc.conf.d/
 echo 'rsyslogd_enable="YES"' > ${TARGET}/etc/rc.conf.d/rsyslogd
 echo 'rsyslogd_pidfile="/var/run/rsyslog.pid"' >> ${TARGET}/etc/rc.conf.d/rsyslogd
 echo 'rsyslogd_config="/usr/local/etc/rsyslog.conf"' >> ${TARGET}/etc/rc.conf.d/rsyslogd
-
+echo 'filebeat_enable="YES"' > ${TARGET}/etc/rc.conf.d/filebeat
 /bin/echo "Ok!"
 
 /bin/echo -n "Updating pkg repositories..."
