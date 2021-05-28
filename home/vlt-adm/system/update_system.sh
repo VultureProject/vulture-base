@@ -33,6 +33,7 @@ update_system() {
         # Firstly try to extract previous download
         /usr/sbin/hbsd-update -t "$temp_dir" -T -D $options
         # If command failed, download the archive
+        if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
         # Restart secadm service after updating kernel
         if [ -n "$jail" ] ; then 
