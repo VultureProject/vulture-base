@@ -31,7 +31,7 @@ update_system() {
         if [ -n "$jail" ] ; then options="-j $jail" ; fi
         # Store (-t) and keep (-T) downloads to $temp_dir for later use
         # Firstly try to extract previous download
-        /usr/sbin/hbsd-update -t "$temp_dir" -T -D $options
+        /usr/sbin/hbsd-update -d -t "$temp_dir" -T -D $options
         # If command failed, download the archive
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
