@@ -8,7 +8,7 @@ fi
 echo -n "Master hostname: "
 read master_hostname
 
-echo -n "Master IP: "
+echo -n "Master IP: (without bracket for IPv6)"
 read master_ip
 
 echo -n "Cluster APIKey: "
@@ -19,7 +19,12 @@ echo "$master_ip    $master_hostname" >> /etc/hosts
 /usr/sbin/service dnsmasq reload
 
 /usr/sbin/jexec redis service redis restart
-/zroot/apache/home/vlt-os/bootstrap/cluster_join $master_hostname $master_ip $api_key && /usr/sbin/service vultured start
+
+if echo "$master_ip" | grep ":" ; then
+    master_ip="[${master_ip}]"
+fi
+
+/zroot/apache/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key" && /usr/sbin/service vultured restart
 
 #FIXME: Handle error
 touch /home/vlt-os/vulture_os/.node_ok
