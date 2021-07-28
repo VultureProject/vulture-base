@@ -11,6 +11,18 @@ secadm {
 		pageexec: false,
 		prefer_acl: true
 	},
+	pax {
+		path: "/usr/home/jails.apache/.zfs-source/home/vlt-os/env/bin/python3.8",
+		mprotect: false,
+		pageexec: false,
+		prefer_acl: true
+	},
+    pax {
+		path: "/usr/local/bin/python3.8",
+		mprotect: false,
+		pageexec: false,
+		prefer_acl: true
+	},
     pax {
         path: "/usr/local/bootstrap-openjdk11/bin/java",
         mprotect: false,

@@ -103,11 +103,10 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 # No need to verify if already done
 /bin/echo "Installing packages into jail... Please be patient"
 
-/usr/sbin/pkg -j ${JAIL} install -y py37-virtualenv || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y openssl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y ap24-py37-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y ap24-py38-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y acme.sh || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y openldap-client || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
@@ -137,10 +136,6 @@ ln -s /home/jails.apache/.zfs-source/home/vlt-os/vulture_os/ /home/vlt-os/vultur
 ln -s /home/jails.apache/.zfs-source/home/vlt-os/scripts/ /home/vlt-os/scripts
 
 touch /home/vlt-os/vulture_os/vulture_os/secret_key.py
-# Stop darwin to prevent use of binary python
-/usr/sbin/service darwin stop
-/usr/local/bin/virtualenv-3.7 --no-pip --no-wheel --no-setuptools /home/vlt-os/env
-/usr/sbin/service darwin start
 
 # Map Vulture-GUI to the Apache JAIL (done via fstab below)
 mkdir -p "${TARGET}/home/vlt-os"
