@@ -8,7 +8,7 @@ fi
 echo -n "Master hostname: "
 read master_hostname
 
-echo -n "Master IP: (without bracket for IPv6)"
+echo -n "Master IP (without bracket for IPv6):"
 read master_ip
 
 echo -n "Cluster APIKey: "
