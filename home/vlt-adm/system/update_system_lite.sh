@@ -83,15 +83,25 @@ fi
 
 # No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
-    echo "[-] Updating gui..."
-    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-gui"
+    if [ -f /usr/sbin/hbsd-update ] ; then
+        echo "[*] disabling secadm rules before updating GUI"
+        /usr/sbin/service secadm stop || echo "Could not disable secadm rules"
+    fi
+
+    echo "[-] Updating GUI..."
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal upgrade -y
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
-    echo "[+] gui updated."
+    echo "[+] GUI updated."
+
+    if [ -f /usr/sbin/hbsd-update ] ; then
+        echo "[*] enabling secadm rules"
+        /usr/sbin/service secadm stop || echo "Could not enable secadm rules"
+    fi
 fi
 
 # No parameter, of dashboard
