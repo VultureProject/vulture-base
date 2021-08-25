@@ -36,7 +36,7 @@ update_system() {
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
         # Restart secadm service after updating kernel
-        if [ -n "$jail" ] ; then 
+        if [ -n "$jail" ] ; then
 	    /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
             /usr/sbin/jexec $jail /usr/sbin/service secadm restart
         else
@@ -114,10 +114,15 @@ if [ -z "$1" -o "$1" == "darwin" ] ; then
     /usr/sbin/service darwin start
 fi
 
-# No parameter, of gui
+# No parameter, or gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
-    echo "[-] Updating gui..."
-    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-gui"
+    if [ -f /usr/sbin/hbsd-update ] ; then
+        echo "[*] disabling secadm rules before updating GUI"
+        /usr/sbin/service secadm stop || echo "Could not disable secadm rules"
+    fi
+
+    echo "[-] Updating GUI..."
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
@@ -128,7 +133,12 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "Ok."
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
-    echo "[+] gui updated."
+    echo "[+] GUI updated."
+
+    if [ -f /usr/sbin/hbsd-update ] ; then
+        echo "[*] enabling secadm rules"
+        /usr/sbin/service secadm start || echo "Could not enable secadm rules"
+    fi
 fi
 
 # If no parameter provided, upgrade vulture-base
@@ -152,7 +162,7 @@ if [ -z "$1" ] ; then
     # Do not start vultured if the node is not installed
     if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
         /usr/sbin/service vultured restart
-        
+
     fi
 fi
 
