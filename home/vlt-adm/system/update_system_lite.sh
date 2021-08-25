@@ -100,7 +100,7 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
 
     if [ -f /usr/sbin/hbsd-update ] ; then
         echo "[*] enabling secadm rules"
-        /usr/sbin/service secadm stop || echo "Could not enable secadm rules"
+        /usr/sbin/service secadm start || echo "Could not enable secadm rules"
     fi
 fi
 
