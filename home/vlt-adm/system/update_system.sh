@@ -27,13 +27,6 @@ update_system() {
         # If command failed, download the archive
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -t "$temp_dir" -T $options ; fi
         if [ $? -ne 0 ] ; then /usr/sbin/hbsd-update -d -t "$temp_dir" -T $options ; fi
-        # Restart secadm service after updating kernel
-        if [ -n "$jail" ] ; then
-	    /usr/sbin/pkg -j $jail install -y secadm secadm-kmod
-            /usr/sbin/jexec $jail /usr/sbin/service secadm restart
-        else
-            /usr/sbin/service secadm restart
-        fi
     else
         # If jail, just install do not fetch
         if [ -n "$jail" ] ; then options="-b /zroot/$jail" ; else option="fetch" ; fi
@@ -150,11 +143,6 @@ if [ -z "$1" ] ; then
     # Then, upgrade all packages
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y
     echo "[+] All packages updated"
-    # Do not start vultured if the node is not installed
-    if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
-        /usr/sbin/service vultured restart
-
-    fi
 fi
 
 # Re-enable secadm rules if on an HardenedBSD system
@@ -166,6 +154,11 @@ if [ -f /usr/sbin/hbsd-update ] ; then
         echo "[*] [${jail}] enabling secadm rules"
         /usr/sbin/jexec $jail /usr/sbin/service secadm start || echo "Could not enable secadm rules"
     done
+fi
+
+# Do not start vultured if the node is not installed
+if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+    /usr/sbin/service vultured restart
 fi
 
 # Remove temporary folder for system updates

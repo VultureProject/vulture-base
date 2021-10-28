@@ -115,11 +115,6 @@ if [ -z "$1" ] ; then
     # Then, upgrade all packages
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y
     echo "[+] All packages updated"
-    # Do not start vultured if the node is not installed
-    if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
-        /usr/sbin/service vultured restart
-        
-    fi
 fi
 
 # Re-enable secadm rules if on an HardenedBSD system
@@ -131,4 +126,9 @@ if [ -f /usr/sbin/hbsd-update ] ; then
         echo "[*] [${jail}] enabling secadm rules"
         /usr/sbin/jexec $jail /usr/sbin/service secadm start || echo "Could not enable secadm rules"
     done
+fi
+
+# Do not start vultured if the node is not installed
+if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+    /usr/sbin/service vultured restart
 fi
