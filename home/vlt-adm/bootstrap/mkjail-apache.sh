@@ -108,7 +108,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y ap24-py38-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y acme.sh || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y openldap-client || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y openldap24-client || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y node || (/bin/echo "Fail !" ; exit 1)
