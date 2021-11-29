@@ -13,17 +13,16 @@ if [ -f /etc/rc.conf.proxy ]; then
     export ftp_proxy=${ftp_proxy}
 fi
 
+# Disable secadm rules if on an HardenedBSD system
+if [ -f /usr/sbin/hbsd-update ] ; then
+    echo "[*] disabling root secadm rules"
+    /usr/sbin/service secadm stop || echo "Could not disable secadm rules"
 
-restart_secadm() {
-    jail="$1"
-    if [ -f /usr/sbin/hbsd-update ] ; then
-        /usr/sbin/jexec $jail /usr/sbin/service secadm restart
-    fi
-}
-
-
-# Create temporary directory for hbsd-update artifacts
-temp_dir="$(mktemp -d)"
+    for jail in "mongodb" "apache" "portal"; do
+        echo "[*] [${jail}] disabling secadm rules"
+        /usr/sbin/jexec $jail /usr/sbin/service secadm stop || echo "Could not disable secadm rules"
+    done
+fi
 
 IGNORE_OSVERSION="yes" /usr/sbin/pkg update -f
 
@@ -35,8 +34,6 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y
         # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail"
-	    # Restart secadm after pkg upgrade, to reload new rules
-	    restart_secadm "$jail"
         echo "Ok."
         case "$jail" in
             rsyslog)
@@ -83,11 +80,6 @@ fi
 
 # No parameter, of gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
-    if [ -f /usr/sbin/hbsd-update ] ; then
-        echo "[*] disabling secadm rules before updating GUI"
-        /usr/sbin/service secadm stop || echo "Could not disable secadm rules"
-    fi
-
     echo "[-] Updating GUI..."
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f
@@ -97,11 +89,6 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
     /usr/sbin/jexec portal /usr/sbin/service apache24 restart
     echo "[+] GUI updated."
-
-    if [ -f /usr/sbin/hbsd-update ] ; then
-        echo "[*] enabling secadm rules"
-        /usr/sbin/service secadm start || echo "Could not enable secadm rules"
-    fi
 fi
 
 # No parameter, of dashboard
@@ -128,9 +115,20 @@ if [ -z "$1" ] ; then
     # Then, upgrade all packages
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y
     echo "[+] All packages updated"
-    # Do not start vultured if the node is not installed
-    if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
-        /usr/sbin/service vultured restart
-        
-    fi
+fi
+
+# Re-enable secadm rules if on an HardenedBSD system
+if [ -f /usr/sbin/hbsd-update ] ; then
+    echo "[*] enabling root secadm rules"
+    /usr/sbin/service secadm start || echo "Could not enable secadm rules"
+
+    for jail in "mongodb" "apache" "portal"; do
+        echo "[*] [${jail}] enabling secadm rules"
+        /usr/sbin/jexec $jail /usr/sbin/service secadm start || echo "Could not enable secadm rules"
+    done
+fi
+
+# Do not start vultured if the node is not installed
+if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+    /usr/sbin/service vultured restart
 fi
