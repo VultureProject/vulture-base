@@ -182,16 +182,6 @@ while getopts 'hDTV:cdust:r:' opt; do
 done
 shift $((OPTIND-1))
 
-echo "temp_dir: '${temp_dir}'"
-echo "resolve_strategy: '${resolve_strategy}'"
-echo "system_version: '${system_version}'"
-echo "keep_temp_dir: ${keep_temp_dir}"
-echo "do_update_system: ${do_update_system}"
-echo "do_update_packages: ${do_update_packages}"
-echo "download_only: ${download_only}"
-echo "use_dnssec: ${use_dnssec}"
-echo "clean_cache: ${clean_cache}"
-
 if [ $clean_cache -gt 0 -a $keep_temp_dir -gt 0 -o $clean_cache -gt 0 -a $download_only -gt 0 ]; then
     echo "[!] Cannot activate -c if -D or -T are set"
     exit 1
