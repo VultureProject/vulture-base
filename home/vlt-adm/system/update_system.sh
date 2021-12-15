@@ -228,16 +228,16 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
 
         if [ $do_update_system -gt 0 ]; then
             /bin/echo "[+] Updating jail $jail base system files..."
-            update_system "$temp_dir" "$jail"
+            update_system "$temp_dir" "$jail" || finalize 1 "Failed to install system upgrades in jail ${jail}"
             echo "[-] Ok."
         fi
 
         if [ $do_update_packages -gt 0 ]; then
             /bin/echo "[+] Updating jail $jail packages..."
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" update -f
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y
+            IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" update -f || finalize 1 "Could not update list of packages for jail ${jail}"
+            IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y || finalize 1 "Could not upgrade packages for jail ${jail}"
             # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail"
+            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail" || finalize 1 "Could not upgrade vulture-${jail}"
             echo "[-] Ok."
         fi
 
@@ -282,9 +282,9 @@ if [ -z "$1" -o "$1" == "darwin" ] ; then
         /usr/sbin/service darwin stop
         echo "[+] Updating darwin..."
         if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin
+            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin || finalize 1 "Failed to upgrade package Darwin"
         else
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y darwin
+            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y darwin || finalize 1 "Failed to upgrade package Darwin"
         fi
         echo "[-] Darwin updated, starting service"
         /usr/sbin/service darwin start
@@ -296,20 +296,20 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[+] Updating GUI..."
     if [ $do_update_packages -gt 0 ]; then
         echo "[+] Updating apache and portal jails' packages..."
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal upgrade -y
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui  || finalize 1 "Failed to upgrade package vulture-gui"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f || finalize 1 "Failed to update the list of packages for the apache jail"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f || finalize 1 "Failed to update the list of packages for the portal jail"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y || finalize 1 "Failed to upgrade packages in the apache jail"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal upgrade -y || finalize 1 "Failed to upgrade packages in the portal jail"
         echo "[-] Ok."
     fi
 
     if [ $do_update_system -gt 0 ]; then
         echo "[+] Updating jail apache base system files..."
-        update_system "$temp_dir" "apache"
+        update_system "$temp_dir" "apache" || finalize 1 "Failed to install system upgrades in jail apache"
         echo "[-] Ok."
         echo "[+] Updating jail portal base system files..."
-        update_system "$temp_dir" "portal"
+        update_system "$temp_dir" "portal" || finalize 1 "Failed to install system upgrades in jail portal"
         echo "[-] Ok."
     fi
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
@@ -321,7 +321,7 @@ fi
 if [ -z "$1" ] ; then
     if [ $do_update_packages -gt 0 ]; then
         echo "[+] Updating vulture-base ..."
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base || finalize 1 "Failed to upgrade vulture-base"
         echo "[-] Vulture-base updated"
     fi
 fi
@@ -330,12 +330,8 @@ fi
 # If no argument - update all
 if [ -z "$1" ] ; then
     if [ $do_update_packages -gt 0 ]; then
-        echo "[+] Updating all packages..."
-        # First upgrade libevent & gnutls independently to prevent removing of vulture-base (don't know why...)
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y libevent
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y gnutls
-        # Then, upgrade all packages
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y
+        echo "[+] Updating all packages on system..."
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y  || finalize 1 "Error while upgrading packages"
         echo "[-] All packages updated"
     fi
 fi
