@@ -87,7 +87,7 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y
     IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal upgrade -y
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
-    /usr/sbin/jexec portal /usr/sbin/service apache24 restart
+    /usr/sbin/jexec portal /usr/sbin/service gunicorn restart
     echo "[+] GUI updated."
 fi
 

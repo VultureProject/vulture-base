@@ -121,7 +121,7 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     update_system "$temp_dir" "portal"
     echo "Ok."
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart
-    /usr/sbin/jexec portal /usr/sbin/service apache24 restart
+    /usr/sbin/jexec portal /usr/sbin/service gunicorn restart
     echo "[+] GUI updated."
 fi
 

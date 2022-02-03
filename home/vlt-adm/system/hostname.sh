@@ -59,7 +59,7 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
 
         # Apache: Hostname change has no impact
         /usr/sbin/jexec apache /usr/sbin/service apache24 restart
-        /usr/sbin/jexec portal /usr/sbin/service apache24 restart
+        /usr/sbin/jexec portal /usr/sbin/service gunicorn restart
 
         # MongoDB is restarted "as this"
         if ! /usr/sbin/jexec mongodb /usr/sbin/service mongod restart ; then
