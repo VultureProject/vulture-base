@@ -81,10 +81,7 @@ for option in "syslogd_enable" "sendmail_enable" "sendmail_submit_enable" \
     fi
 done
 
-/bin/echo 'apache24_enable="YES"' > ${TARGET}/etc/rc.conf.d/apache24
-/bin/echo 'apache24_http_accept_enable="YES"' >> ${TARGET}/etc/rc.conf.d/apache24
-/bin/echo 'apache24_profiles="portal"' >> ${TARGET}/etc/rc.conf.d/apache24
-/bin/echo 'apache24_portal_configfile="/usr/local/etc/apache24/portal-httpd.conf"' >> ${TARGET}/etc/rc.conf.d/apache24
+/bin/echo 'gunicorn_enable="YES"' > ${TARGET}/etc/rc.conf.d/gunicorn
 
 /bin/echo "Ok!"
 
@@ -103,8 +100,6 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Installing packages into jail... Please be patient"
 
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y ap24-py38-mod_wsgi || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y openldap24-client || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y radiusclient || (/bin/echo "Fail !" ; exit 1)
