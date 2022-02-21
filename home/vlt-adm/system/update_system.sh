@@ -71,6 +71,11 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
                 ;;
             mongodb)
                 /usr/sbin/jexec "$jail" /usr/sbin/service mongod restart
+                # TODO Force disable pageexec and mprotect on the mongo executable
+                # there seems to be a bug currently with secadm when rules are pre-loaded on executables in packages
+                # which is the case for latest mongodb36-3.6.23
+                /usr/sbin/jexec "$jail" /usr/sbin/hbsdcontrol pax disable pageexec /usr/local/bin/mongo
+                /usr/sbin/jexec "$jail" /usr/sbin/hbsdcontrol pax disable mprotect /usr/local/bin/mongo
                 ;;
             redis)
                 /usr/sbin/jexec "$jail" /usr/sbin/service sentinel stop
