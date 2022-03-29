@@ -121,10 +121,10 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/echo "Ok !"
 
 # Copy needed files from vulture-haproxy package to apache jail
-mkdir -p /home/jails.apache/.zfs-source/usr/local/sbin
-mkdir -p /home/jails.apache/.zfs-source/usr/local/lib
-/bin/cp -Rpf /home/jails.haproxy/.zfs-source/usr/local/sbin/haproxy /home/jails.apache/.zfs-source/usr/local/sbin/haproxy
-/bin/cp -Rpf /home/jails.haproxy/.zfs-source/usr/local/lib/libslz.* /home/jails.apache/.zfs-source/usr/local/lib/
+mkdir -p /zroot/apache/usr/local/sbin
+mkdir -p /zroot/apache/usr/local/lib
+/bin/cp -Rpf /home/jails.haproxy/.zfs-source/usr/local/sbin/haproxy /zroot/apache/usr/local/sbin/haproxy
+/bin/cp -Rpf /home/jails.haproxy/.zfs-source/usr/local/lib/libslz.* /zroot/apache/usr/local/lib/
 
 
 # Jail NEEDS to be modified after system file modification !!!
