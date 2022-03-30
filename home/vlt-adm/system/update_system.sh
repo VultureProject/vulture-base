@@ -10,7 +10,7 @@ keep_temp_dir=0
 do_update_system=1
 do_update_packages=1
 download_only=0
-use_dnssec=1
+use_dnssec=0
 clean_cache=0
 
 #############
@@ -23,7 +23,7 @@ usage() {
     echo "	-T	keep temporary directory"
     echo "	-V	set a custom system update package (as specified by 'hbsd-update -v', only available on HBSD)"
     echo "	-c	clean pkg cache and tempdir at the end of the script (incompatible with -T and -D)"
-    echo "	-d	do not use dnssec while downloading HardenedBSD updates (enabled by default)"
+    echo "	-d	use dnssec while downloading HardenedBSD updates (disabled by default)"
     echo "	-u	do not update system/kernel, only update packages"
     echo "	-s	do not update packages, only update system/kernel"
     echo "	-t tmpdir	temporary directory to use (default is /tmp/vulture_update/, only available on HBSD)"
@@ -166,7 +166,7 @@ while getopts 'hDTV:cdust:r:' opt; do
             ;;
         c)  clean_cache=1;
             ;;
-        d)  use_dnssec=0;
+        d)  use_dnssec=1;
             ;;
         u)  do_update_system=0;
             ;;
