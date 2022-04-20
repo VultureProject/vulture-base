@@ -116,9 +116,16 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y liblognorm || (/bin/echo "Fail !" ; exit 1)
 
-#Haproxy is needed inside the jail to test haproxy configuration (1.9.0 minimum required)
-/usr/sbin/pkg -j ${JAIL} install -y haproxy || (/bin/echo "Fail !" ; exit 1)
+# Needed dependency for haproxy package copied from vulture-haproxy
+/usr/sbin/pkg -j ${JAIL} install -y pcre2 || (/bin/echo "Fail !" ; exit 1)
 /bin/echo "Ok !"
+
+# Copy needed files from vulture-haproxy package to apache jail
+mkdir -p /zroot/apache/usr/local/sbin
+mkdir -p /zroot/apache/usr/local/lib
+/bin/cp -Rpf /home/jails.haproxy/.zfs-source/usr/local/sbin/haproxy /zroot/apache/usr/local/sbin/haproxy
+/bin/cp -Rpf /home/jails.haproxy/.zfs-source/usr/local/lib/libslz.* /zroot/apache/usr/local/lib/
+
 
 # Jail NEEDS to be modified after system file modification !!!
 /bin/echo -n "Syncing jail..."
