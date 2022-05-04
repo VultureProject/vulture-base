@@ -170,10 +170,6 @@ jexec ${JAIL} find /var/log/vulture -type d -exec chmod 775 {} \;
 /bin/mkdir -p ${TARGET}/usr/local/etc/haproxy.d
 /usr/sbin/chown -R vlt-os:vlt-web ${TARGET}/usr/local/etc/haproxy.d
 
-# Defender conf files
-/bin/mkdir -p ${TARGET}/usr/local/etc/defender.d
-/usr/sbin/chown -R vlt-os:vlt-web ${TARGET}/usr/local/etc/defender.d
-
 # Test conf HAProxy
 jexec ${JAIL} /bin/mkdir -p /var/tmp/haproxy
 jexec ${JAIL} chown vlt-os:vlt-web /var/tmp/haproxy
@@ -187,10 +183,6 @@ jexec ${JAIL} chmod 755 /var/tmp/haproxy
 /bin/mkdir -p ${TARGET}/var/sockets/redis/
 /bin/mkdir -p ${TARGET}/var/sockets/daemon/
 
-#Documentation
-/bin/mkdir -p ${TARGET}/var/db/documentation
-/usr/sbin/chown -R vlt-os:wheel ${TARGET}/var/db/documentation
-chmod 700 ${TARGET}/var/db/documentation
 
 /bin/echo "Ok !"
 
@@ -199,7 +191,6 @@ file="/etc/fstab"
 for mount_path in "/var/db/pki ${TARGET}/var/db/pki" \
 "/home/jails.apache/.zfs-source/home/vlt-os ${TARGET}/home/vlt-os" \
 "/usr/local/etc/haproxy.d ${TARGET}/usr/local/etc/haproxy.d" \
-"/usr/local/etc/defender.d ${TARGET}/usr/local/etc/defender.d" \
 "/home/darwin/conf ${TARGET}/home/darwin/conf" \
 "/var/sockets/redis ${TARGET}/var/sockets/redis" \
 "/var/sockets/daemon ${TARGET}/var/sockets/daemon"; do

@@ -27,9 +27,6 @@ vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy hardreload
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy restart
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service haproxy configtest
 
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service defender onestatus
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec haproxy /usr/sbin/service defender restart
-
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd restart
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd onestatus
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd start
@@ -88,8 +85,6 @@ vlt-os ALL=NOPASSWD:/usr/sbin/service pf restart
 vlt-os ALL=NOPASSWD:/usr/sbin/service pf onestatus
 
 vlt-os ALL=NOPASSWD:/usr/sbin/service sshd onestatus
-
-vlt-os ALL=NOPASSWD:/usr/local/sbin/vm
 
 #FIXME
 vlt-os ALL=NOPASSWD:/usr/sbin/pkg

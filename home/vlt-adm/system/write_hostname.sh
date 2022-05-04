@@ -42,14 +42,6 @@ ip="$(/bin/cat /usr/local/etc/management.ip)"
 for jail in apache mongodb redis rsyslog haproxy portal; do
     /bin/cp /usr/local/etc/management.ip /zroot/${jail}/usr/local/etc/management.ip
     /bin/echo "${hostname}" > /zroot/${jail}/etc/host-hostname
+    /bin/echo "nameserver ${jail}" > /zroot/${jail}/etc/resolv.conf
 done
 
-#Adapt dnsmasq configuration, if needed
-if ! /usr/local/sbin/vm switch info public > /dev/null 2>&1 ; then
-    /usr/bin/sed -i '' "s/interface=vm-public/interface=tap0/" /usr/local/etc/dnsmasq.conf
-else
-    /sbin/ifconfig tap0 destroy > /dev/null 2>&1
-    /usr/bin/sed -i '' 's/ifconfig_tap0="inet 192.168.1.1 netmask 255.255.255.0"//' /etc/rc.conf.d/network
-    /sbin/ifconfig vm-public 192.168.1.1/24
-fi
-/usr/sbin/service dnsmasq reload
