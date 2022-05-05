@@ -29,5 +29,5 @@ TARGET="/zroot/$1"
 /bin/echo "127.0.0.7 portal" >> ${TARGET}/etc/hosts
 /bin/echo "fd00::207 portal" >> ${TARGET}/etc/hosts
 
-# Host's dnsmasq resolver is used by jails
-echo "nameserver 127.0.0.1" > ${TARGET}/etc/resolv.conf
+# Host's dnsmasq resolver is used by jails -> local loopback of the jail
+echo "nameserver ${TARGET}" > ${TARGET}/etc/resolv.conf
