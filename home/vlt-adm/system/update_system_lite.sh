@@ -91,12 +91,6 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[+] GUI updated."
 fi
 
-# No parameter, of dashboard
-if [ -z "$1" -o "$1" == "dashboard" ] ; then
-    /usr/sbin/pkg upgrade -y "vulture-dashboard" || /bin/echo "vulture-dashboard not installed. skipping..."
-    /usr/sbin/jexec apache /usr/sbin/service dashboard restart || /bin/echo "service dashboard not found. skipping..."
-fi
-
 # If no parameter provided, upgrade vulture-base
 if [ -z "$1" ] ; then
     echo "[-] Updating vulture-base ..."
