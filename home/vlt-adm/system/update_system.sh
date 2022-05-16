@@ -148,6 +148,9 @@ finalize() {
         done
     fi
 
+    # Be sure to restart dnsmasq: No side-effect and it deals with dnsmasq configuration changes
+    service dnsmasq restart
+
     exit $err_code
 }
 

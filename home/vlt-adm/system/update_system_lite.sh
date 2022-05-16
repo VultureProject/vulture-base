@@ -126,3 +126,6 @@ fi
 if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
     /usr/sbin/service vultured restart
 fi
+
+# Be sure to restart dnsmasq: No side-effect and it deals with dnsmasq configuration changes
+service dnsmasq restart
