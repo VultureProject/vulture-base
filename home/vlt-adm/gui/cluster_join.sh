@@ -25,6 +25,3 @@ if echo "$master_ip" | grep ":" ; then
 fi
 
 /zroot/apache/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key" && /usr/sbin/service vultured restart
-
-#FIXME: Handle error
-touch /home/vlt-os/vulture_os/.node_ok
