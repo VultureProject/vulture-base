@@ -340,7 +340,8 @@ if [ -z "$1" ] ; then
 fi
 
 # Do not start vultured if the node is not installed
-if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+/usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1
+if [ $? = 0 ] ; then
     /usr/sbin/service vultured restart
 fi
 

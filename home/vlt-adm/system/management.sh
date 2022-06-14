@@ -43,11 +43,13 @@ if [ "$?" == 0 ]; then
     /usr/sbin/jexec mongodb service mongod restart
 
     # If boostrap as already be done, update node management ip in Mongo
-    if [ -f /home/vlt-os/vulture_os/.install ] ; then
+    /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py check >/dev/null 2>&1
+    if [ $? = 0 ] ; then
         /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$ip\" ; n.save()"
     fi
     # If cluster create has already be done, update management ip in apache conf
-    if [ -f /home/vlt-os/vulture_os/.node_ok ] ; then
+    /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1
+    if [ $? = 0 ] ; then
         /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from services.apache.apache import reload_conf ; import logging ; logger=logging.getLogger('services') ; reload_conf(logger)"
     fi
 else
