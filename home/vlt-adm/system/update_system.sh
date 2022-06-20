@@ -67,7 +67,7 @@ update_system() {
         # Previous download should be present in the 'download_dir' folder already
         if [ -n "$resolve_strategy" ] ; then
             # echo resolve strategy to hbsd-update for non-interactive resolution of conflicts in /etc/ via etcupdate
-            /bin/echo "$resolve_strategy" | /usr/sbin/hbsd-update -d -t "$download_dir" -T -D $options
+            /usr/bin/yes "$resolve_strategy" | /usr/sbin/hbsd-update -d -t "$download_dir" -T -D $options
         else
             /usr/sbin/hbsd-update -d -t "$download_dir" -T -D $options
         fi
