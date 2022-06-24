@@ -133,6 +133,9 @@ mkdir -p /zroot/apache/usr/local/lib
 /bin/echo "Ok!"
 
 cp -rf /home/jails.apache/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
+if [ ! -f ${TARGET}/usr/local/etc/apache24/extra/timeouts.conf ] ; then
+    /bin/cp /home/jails.apache/.zfs-source/usr/local/etc/apache24/extra/timeouts.conf.sample ${TARGET}/usr/local/etc/apache24/extra/timeouts.conf
+fi
 
 /bin/mkdir ${TARGET}/var/db/pki
 
