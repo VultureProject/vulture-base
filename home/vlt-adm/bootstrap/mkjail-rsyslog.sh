@@ -46,9 +46,9 @@ fi
 if [ "$?" == "0" ]; then
 	echo "Warning, jail configuration for ${JAIL} already exists !"
 else
-    management_ip=$(/bin/cat /usr/local/etc/management.ip)
+    management_ip=$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)
     # If IPv6
-    if grep ":" /usr/local/etc/management.ip ; then
+    if /usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip | /usr/bin/grep ":" > /dev/null 2>&1; then
         /bin/cat /home/jails.rsyslog/config/${JAIL}-jail.tpl | /usr/bin/sed "s/{{ip_config}}/ip6.addr += \"$management_ip\";/" >> /etc/jail.conf
     else
         /bin/cat /home/jails.rsyslog/config/${JAIL}-jail.tpl | /usr/bin/sed "s/{{ip_config}}/ip4.addr += \"$management_ip\";/" >> /etc/jail.conf

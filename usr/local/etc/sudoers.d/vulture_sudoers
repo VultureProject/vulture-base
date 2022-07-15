@@ -1,6 +1,7 @@
 vlt-os ALL=NOPASSWD:/usr/sbin/chown
 vlt-os ALL=NOPASSWD:/bin/chmod
 vlt-os ALL=NOPASSWD:/bin/mv
+vlt-os ALL=NOPASSWD:/usr/sbin/sysrc
 
 vlt-os ALL=NOPASSWD:/usr/sbin/service mongod start
 vlt-os ALL=NOPASSWD:/usr/sbin/service mongod stop

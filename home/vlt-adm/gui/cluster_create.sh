@@ -31,7 +31,7 @@ if [ "$password" = "$confirm_password" ]; then
     curl -XGET -kw "Status  code : %{http_code}\n"  -o /dev/null https://$(hostname):8000/ 2> /dev/null
 
     /usr/sbin/jexec redis service redis restart
-    /usr/sbin/jexec apache /home/vlt-os/bootstrap/cluster_create $username $password
+    /home/jails.apache/.zfs-source/home/vlt-os/bootstrap/cluster_create $username $password
 
     # Restart apache service to refresh code and conf
     /usr/sbin/jexec apache /usr/sbin/service apache24 restart

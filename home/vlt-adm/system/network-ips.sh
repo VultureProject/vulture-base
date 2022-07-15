@@ -6,11 +6,15 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
    exit 1
 fi
 
-ip="$1"
+management_ip="$1"
+internet_ip="$2"
+backends_outgoing_ip="$3"
+logom_outgoing_ip="$4"
 
-/sbin/ifconfig | grep "$ip" > /dev/null
+/sbin/ifconfig | grep "$management_ip" > /dev/null
 if [ "$?" == 0 ]; then
-    /bin/echo "$ip" > /usr/local/etc/management.ip
+    # update node network ips in /etc/rc.conf.d/network
+    /usr/sbin/sysrc -f /etc/rc.conf.d/network management_ip=$management_ip internet_ip=$internet_ip backends_outgoing_ip=$backends_outgoing_ip logom_outgoing_ip=$logom_outgoing_ip
 
     #Update /etc/hosts with the new Management IP address
     /home/vlt-adm/system/write_hostname.sh
@@ -22,16 +26,16 @@ if [ "$?" == 0 ]; then
     /usr/sbin/jexec redis /usr/sbin/service redis stop > /dev/null
     /usr/sbin/jexec redis /usr/sbin/service sentinel stop > /dev/null
 
-    /bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/{{ management_ip }}/${ip}/" > /usr/local/etc/redis/redis.conf
-    /bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/{{ management_ip }}/${ip}/" > /usr/local/etc/redis/sentinel.conf
+    /bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/redis.conf
+    /bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/sentinel.conf
 
     /usr/sbin/jexec redis /usr/sbin/service redis start > /dev/null
     /usr/sbin/jexec redis /usr/sbin/service sentinel start > /dev/null
 
     #Update Rsyslog jail conf
-    case $ip in
-        *:*) /usr/bin/sed -Ei '' $'s/^.+#RSYSLOGJAILIP$/\t ip6.addr += '$ip$'; \t\t\t\t\t #RSYSLOGJAILIP/' "/etc/jail.conf";;
-        *) /usr/bin/sed -Ei '' $'s/^.+#RSYSLOGJAILIP$/\t ip4.addr += '$ip$'; \t\t\t\t\t #RSYSLOGJAILIP/' "/etc/jail.conf";;
+    case $management_ip in
+        *:*) /usr/bin/sed -Ei '' $'s/^.+#RSYSLOGJAILIP$/\t ip6.addr += '$management_ip$'; \t\t\t\t\t #RSYSLOGJAILIP/' "/etc/jail.conf";;
+        *) /usr/bin/sed -Ei '' $'s/^.+#RSYSLOGJAILIP$/\t ip4.addr += '$management_ip$'; \t\t\t\t\t #RSYSLOGJAILIP/' "/etc/jail.conf";;
     esac
 
     /usr/sbin/service jail restart rsyslog
@@ -45,8 +49,8 @@ if [ "$?" == 0 ]; then
     # If boostrap has already be done,
     if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
         # update node management ip in Mongo
-        /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$ip\" ; n.save()"
-        # update management ip in apache conf
+        /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$management_ip\" ; n.internet_ip = \"$internet_ip\" ; n.backends_outgoing_ip = \"$backends_outgoing_ip\" ; n.logom_outgoing_ip = \"$logom_outgoing_ip\" ; n.save()"
+            # update management ip in apache conf
         /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from services.apache.apache import reload_conf ; import logging ; logger=logging.getLogger('services') ; reload_conf(logger)"
     fi
 else

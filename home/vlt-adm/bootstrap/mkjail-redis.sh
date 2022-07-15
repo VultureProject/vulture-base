@@ -20,7 +20,7 @@ if [ -f /etc/rc.conf.proxy ]; then
 fi
 
 # Retrieve management IP address
-ip="$(/bin/cat /usr/local/etc/management.ip)"
+ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
 # Ip no management IP - exit
 if [ -z "$ip" ] ; then
     /bin/echo "Management IP address is null - please select 'Management' and retry." >> /dev/stderr
