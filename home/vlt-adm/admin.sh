@@ -35,7 +35,7 @@ do
     "password" "Modify vlt-adm's password" \
     "geli_change" "Modify FDE password" \
     "email" "Define Email address to send alerts to" \
-    "management" "Change Management IP" \
+    "network_ips" "Change Node Network IPs" \
     "proxy" "HTTP Proxy config"     \
     "netconfig" "Network config"    \
     "hostname" "Hostname config"    \
@@ -70,26 +70,57 @@ do
                         /usr/local/bin/sudo /home/vlt-adm/system/geli-passphrase.sh "${passphrase}"
                     fi
                     ;;
-                "management")
+                "network_ips")
                     check_jails
 
                     /bin/rm -f "$tmp_file"
                     if [ ! -f /usr/local/etc/management.ip ]; then
-                        ip="$(/sbin/ifconfig | /usr/bin/grep inet | /usr/bin/grep -v '127.0.0.1' | /usr/bin/grep -v ' ::1 ' \
+                        management_ip="$(/sbin/ifconfig | /usr/bin/grep inet | /usr/bin/grep -v '127.0.0.1' | /usr/bin/grep -v ' ::1 ' \
                         | /usr/bin/grep -v 'fe80:' | /usr/bin/awk '{print $2}' | /usr/bin/awk -vRS="" -vOFS=' ' '$1=$1')"
                     else
-                        ip="$(/bin/cat /usr/local/etc/management.ip)"
+                        management_ip="$(/bin/cat /usr/local/etc/management.ip)"
                     fi
 
-                    if /usr/bin/dialog --title "Vulture Management interface" --inputbox "Choose the management IP Address" 8 60 "${ip}" --stdout > "$tmp_file"; then
-                        ip="$(/bin/cat "$tmp_file")"
+                    /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1
+                    if [ $? = 0 ] ; then
+                        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; \
+                        n = Node.objects.get(name=\"`hostname`\" ) ; print (f\"{n.internet_ip}\n{n.backends_outgoing_ip}\n{n.logom_outgoing_ip}\")" > "$tmp_file"
+                        internet_ip="$(/usr/bin/sed -n 1p "$tmp_file")"
+                        backends_outgoing_ip="$(/usr/bin/sed -n 2p "$tmp_file")"
+                        logom_outgoing_ip="$(/usr/bin/sed -n 3p "$tmp_file")"
+
+                        /bin/rm -f "$tmp_file"
+                    else
+                        internet_ip=$management_ip
+                        backends_outgoing_ip=$management_ip
+                        logom_outgoing_ip=$management_ip
+                    fi
+
+                    if /usr/bin/dialog --title "Vulture Node Network settings" --form "Choose the Node's network IP Addresses" 14 60 8 \
+                    "Management IP Address:" 1 1 "$management_ip" 1 25 25 30 \
+                    "Internet IP:" 3 1 "$internet_ip" 3 25 25 30 \
+                    "Backend Outgoing IP:" 5 1 "$backends_outgoing_ip" 5 25 25 30 \
+                    "LogOM Outgoing IP:" 7 1 "$logom_outgoing_ip" 7 25 25 30 \
+                    --stdout > "$tmp_file"; then
+
+                        management_ip="$(/usr/bin/sed -n 1p "$tmp_file")"
+                        internet_ip="$(/usr/bin/sed -n 2p "$tmp_file")"
+                        backends_outgoing_ip="$(/usr/bin/sed -n 3p "$tmp_file")"
+                        logom_outgoing_ip="$(/usr/bin/sed -n 4p "$tmp_file")"
+                        
                         /bin/rm "$tmp_file"
 
-                        if  echo "$ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'; then
-                            /usr/local/bin/sudo /home/vlt-adm/system/netconfig-resolv.sh
-                    	    /usr/local/bin/sudo /home/vlt-adm/system/management.sh "${ip}"
+                        if !(echo "$management_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                            /usr/bin/dialog --msgbox "Management IP format incorrect" 8 60
+                        elif !(echo "$internet_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                            /usr/bin/dialog --msgbox "Internet IP format incorrect" 8 60
+                        elif  !(echo "$backends_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                            /usr/bin/dialog --msgbox "Backend Outgoing IP format incorrect" 8 60
+                        elif  !(echo "$logom_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                            /usr/bin/dialog --msgbox "LogOM Outgoing IP format incorrect" 8 60
                         else
-                            /usr/bin/dialog --msgbox "IP format incorrect" 8 60
+                            /usr/local/bin/sudo /home/vlt-adm/system/netconfig-resolv.sh
+                    	    /usr/local/bin/sudo /home/vlt-adm/system/network-ips.sh "${management_ip}" "${internet_ip}" "${backends_outgoing_ip}" "${logom_outgoing_ip}"
                         fi
                     fi
                     ;;
