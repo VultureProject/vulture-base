@@ -36,7 +36,6 @@ And create **repository configuration** file : <br>
 Then, **install** required **packages** : <br>
 `pkg update` <br>
 `pkg install -y open-vm-tools-nox11 wget libucl secadm secadm-kmod` <br>
-`pkg install -y vulture-libtensorflow` <br>
 `pkg install -y vulture-haproxy` <br>
 `pkg install -y vulture-rsyslog` <br>
 `pkg install -y vulture-mongodb` <br>
