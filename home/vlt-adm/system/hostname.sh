@@ -68,8 +68,7 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
         fi
 
         # Initialize the mongoDB replicaset, if bootstrap is not done yet
-        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py check >/dev/null 2>&1
-        if [ $? = 1 ] ; then
+        if ! /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py check >/dev/null 2>&1 ; then
             export hostname=${hostname}
             options="--ssl --sslPEMKeyFile /var/db/pki/node.pem --sslCAFile /var/db/pki/ca.pem"
             # If the management IP is an IPv6 address
