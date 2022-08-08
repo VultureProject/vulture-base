@@ -45,3 +45,5 @@ for jail in apache mongodb redis rsyslog haproxy portal; do
     /bin/echo "nameserver ${jail}" > /zroot/${jail}/etc/resolv.conf
 done
 
+# Reload dnsmasq service to account for potential changes in /etc/hosts
+/usr/sbin/service dnsmasq reload
