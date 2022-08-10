@@ -107,10 +107,6 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/mkdir -p /usr/local/etc/haproxy.d/templates
 /usr/sbin/chown -R vlt-os:vlt-web /usr/local/etc/haproxy.d
 
-/bin/mkdir -p ${TARGET}/usr/local/etc/defender.d
-/usr/sbin/chown -R vlt-os:vlt-web /usr/local/etc/defender.d
-/bin/chmod 640 /usr/local/etc/defender.d/*
-
 /bin/mkdir -p /var/tmp/haproxy/
 /usr/sbin/chown -R vlt-os:vlt-web /var/tmp/haproxy/
 /usr/sbin/chown -R vlt-os:vlt-web ${TARGET}/var/tmp/haproxy/
@@ -123,9 +119,6 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /bin/mkdir -p ${TARGET}/var/sockets/haproxy
 /bin/mkdir -p ${TARGET}/home/darwin/spoa
 
-chown haproxy ${TARGET}/var/log/defender
-chown haproxy ${TARGET}/var/run/defender
-
 /bin/mkdir -p ${TARGET}/var/sockets/darwin
 /usr/sbin/chown -R darwin:vlt-web ${TARGET}/var/sockets/darwin
 /bin/chmod 750 ${TARGET}/var/sockets/darwin
@@ -135,7 +128,6 @@ file="/etc/fstab"
 for mount_path in "/var/tmp/haproxy ${TARGET}/var/tmp/haproxy" \
 "/var/db/pki ${TARGET}/var/db/pki" \
 "/usr/local/etc/haproxy.d ${TARGET}/usr/local/etc/haproxy.d" \
-"/usr/local/etc/defender.d ${TARGET}/usr/local/etc/defender.d" \
 "/var/sockets/rsyslog ${TARGET}/var/sockets/rsyslog" \
 "/var/sockets/darwin ${TARGET}/var/sockets/darwin"; do
     if [ "$(/usr/bin/grep "$mount_path" "$file" 2> /dev/null)" == "" ]  ; then

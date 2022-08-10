@@ -29,18 +29,5 @@ TARGET="/zroot/$1"
 /bin/echo "127.0.0.7 portal" >> ${TARGET}/etc/hosts
 /bin/echo "fd00::207 portal" >> ${TARGET}/etc/hosts
 
-# Get the vm_switch IP
-if ! [ -f /usr/local/etc/vm_switch.ip ] ; then
-    echo "File /usr/local/etc/vm_switch.ip not found. Using default 192.168.1.1 as resolver."
-    echo "192.168.1.1" > /usr/local/etc/vm_switch.ip
-else
-    ip="$(/bin/cat /usr/local/etc/vm_switch.ip)"
-fi
-
-# If the ip is null - Set default 192.168.1.1
-if [ -z "$ip" ] ; then
-    echo "File /usr/local/etc/vm_switch.ip empty, using default 192.168.1.1 as resolver."
-    ip="192.168.1.1"
-fi
-
-echo "nameserver $ip" > ${TARGET}/etc/resolv.conf
+# Host's dnsmasq resolver is used by jails -> local loopback of the jail
+echo "nameserver ${TARGET}" > ${TARGET}/etc/resolv.conf

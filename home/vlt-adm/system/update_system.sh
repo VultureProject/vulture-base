@@ -148,6 +148,9 @@ finalize() {
         done
     fi
 
+    # Be sure to restart dnsmasq: No side-effect and it deals with dnsmasq configuration changes
+    service dnsmasq restart
+
     exit $err_code
 }
 
@@ -337,7 +340,7 @@ if [ -z "$1" ] ; then
 fi
 
 # Do not start vultured if the node is not installed
-if [ -f /home/vlt-os/vulture_os/.node_ok ]; then
+if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
     /usr/sbin/service vultured restart
 fi
 

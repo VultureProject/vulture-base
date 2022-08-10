@@ -47,7 +47,7 @@ fi
 if [ "$?" == "0" ]; then
 	/bin/echo "Warning, jail configuration for ${JAIL} already exists !"
 else
-	/bin/cat /home/jails.apache/config/portal-jail.tpl >> /etc/jail.conf
+	/bin/cat /home/jails.portal/config/portal-jail.tpl >> /etc/jail.conf
 	/bin/echo "Ok!"
 fi
 
@@ -122,7 +122,7 @@ chmod 750 /home/jails.apache/.zfs-source/home/vlt-os/scripts
 chmod 550 /home/jails.apache/.zfs-source/home/vlt-os/scripts/*
 chmod 750 /home/jails.apache/.zfs-source/home/vlt-os/vulture_os
 
-cp -rf /home/jails.apache/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
+cp -rf /home/jails.portal/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
 
 /bin/mkdir ${TARGET}/var/db/pki
 
