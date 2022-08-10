@@ -6,8 +6,7 @@ management_ip="$(/bin/cat /usr/local/etc/management.ip)"
 grep ':' /usr/local/etc/management.ip > /dev/null
 #IPV6 Management address
 if [ "$?" == "0" ]; then
-    MASQUERADING="nat pass proto udp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 53 -> ${management_ip}  # jails -> DNS
-nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 80 -> ${management_ip}  # jails -> HTTP
+    MASQUERADING="nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 80 -> ${management_ip}  # jails -> HTTP
 nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 3128 -> ${management_ip}  # jails -> Proxy
 nat pass proto tcp from fd00::206 to any port 443 -> ${management_ip}  # vultureproject.org
 nat pass proto tcp from fd00::206 to ${management_ip} port { 1978,6379,8000,9091 } -> ${management_ip}  # Haproxy, Redis, AdminGUI, Mongodb
@@ -26,8 +25,7 @@ rdr pass proto tcp from any to ${management_ip} port 26379 -> fd00::203
     REMOTE_TO_JAIL="rdr pass log proto tcp from any to ${management_ip} port { 8000 } -> fd00::206 port 8000"
     JAIL_INTERCONNECTION="pass quick proto tcp from fd00::205 to fd00::207 port 9000"
 else
-    MASQUERADING="nat pass proto udp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 53 -> ${management_ip}  # jails -> DNS
-nat pass proto tcp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 80 -> ${management_ip}  # jails -> HTTP
+    MASQUERADING="nat pass proto tcp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 80 -> ${management_ip}  # jails -> HTTP
 nat pass proto tcp from { 127.0.0.2,127.0.0.3,127.0.0.4,127.0.0.5,127.0.0.6,127.0.0.7 } to any port 3128 -> ${management_ip}  # jails -> HTTP
 nat pass proto tcp from 127.0.0.6 to any port 443 -> ${management_ip}  # Apache jail -> vultureproject.org
 nat pass proto tcp from 127.0.0.6 to any port { 1978,6379,8000,9091 } -> ${management_ip}   # Haproxy, Redis, AdminGUI, Mongodb

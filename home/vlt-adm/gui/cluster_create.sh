@@ -34,9 +34,6 @@ if [ "$password" = "$confirm_password" ]; then
     /usr/sbin/jexec apache /home/vlt-os/bootstrap/cluster_create $username $password
 
     /usr/sbin/service vultured start
-
-    #FIXME: Handle error
-    touch /home/vlt-os/vulture_os/.node_ok
 else
     echo "\e[31mPasswords mismatch\e[0m"
     exit
