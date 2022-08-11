@@ -48,10 +48,10 @@ if [ "$?" == 0 ]; then
 
     # If boostrap has already be done,
     if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
-        # update node management ip in Mongo
+        # update node network ips in Mongo
         /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$management_ip\" ; n.internet_ip = \"$internet_ip\" ; n.backends_outgoing_ip = \"$backends_outgoing_ip\" ; n.logom_outgoing_ip = \"$logom_outgoing_ip\" ; n.save()"
-            # update management ip in apache conf
-        /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from services.apache.apache import reload_conf ; import logging ; logger=logging.getLogger('services') ; reload_conf(logger)"
+        # reload apache service
+        /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from services.apache.apache import reload_service ; import logging ; logger=logging.getLogger('services') ; reload_service(logger)"
     fi
 else
     /bin/echo "Invalid IP Address !"
