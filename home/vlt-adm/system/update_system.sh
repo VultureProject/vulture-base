@@ -149,7 +149,7 @@ finalize() {
     fi
 
     # Be sure to restart dnsmasq: No side-effect and it deals with dnsmasq configuration changes
-    service dnsmasq restart
+    /usr/sbin/service dnsmasq restart
 
     exit $err_code
 }
@@ -300,6 +300,12 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
     if [ $do_update_packages -gt 0 ]; then
         echo "[+] Updating apache and portal jails' packages..."
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui  || finalize 1 "Failed to upgrade package vulture-gui"
+
+        /bin/echo "[+] Reloading dnsmasq..."
+        # Ensure dnsmasq is up-to-date, as it could be modified during vulture-gui upgrade
+        /usr/sbin/service dnsmasq reload || /usr/sbin/service dnsmasq restart
+        /bin/echo "[-] dnsmasq reloaded"
+
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache update -f || finalize 1 "Failed to update the list of packages for the apache jail"
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j portal update -f || finalize 1 "Failed to update the list of packages for the portal jail"
         IGNORE_OSVERSION="yes" /usr/sbin/pkg -j apache upgrade -y || finalize 1 "Failed to upgrade packages in the apache jail"
@@ -325,6 +331,12 @@ if [ -z "$1" ] ; then
     if [ $do_update_packages -gt 0 ]; then
         echo "[+] Updating vulture-base ..."
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base || finalize 1 "Failed to upgrade vulture-base"
+
+        /bin/echo "[+] Reloading dnsmasq..."
+        # Ensure dnsmasq is up-to-date, as it could be modified during vulture-base upgrade
+        /usr/sbin/service dnsmasq reload || /usr/sbin/service dnsmasq restart
+        /bin/echo "[-] dnsmasq reloaded"
+
         echo "[-] Vulture-base updated"
     fi
 fi
