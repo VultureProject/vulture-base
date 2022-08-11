@@ -11,7 +11,8 @@ if [ $# -ne 1 ] ; then
     exit 1
 fi
 
-TARGET="/zroot/$1"
+JAIL_NAME="$1"
+TARGET="/zroot/${JAIL_NAME}"
 
 # Configure /etc/hosts of jail
 /bin/echo "::1 localhost" > ${TARGET}/etc/hosts
@@ -30,4 +31,4 @@ TARGET="/zroot/$1"
 /bin/echo "fd00::207 portal" >> ${TARGET}/etc/hosts
 
 # Host's dnsmasq resolver is used by jails -> local loopback of the jail
-echo "nameserver ${TARGET}" > ${TARGET}/etc/resolv.conf
+echo "nameserver ${JAIL_NAME}" > ${TARGET}/etc/resolv.conf
