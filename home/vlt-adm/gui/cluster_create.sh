@@ -33,6 +33,9 @@ if [ "$password" = "$confirm_password" ]; then
     /usr/sbin/jexec redis service redis restart
     /usr/sbin/jexec apache /home/vlt-os/bootstrap/cluster_create $username $password
 
+    # Restart apache service to refresh code and conf
+    /usr/sbin/jexec apache /usr/sbin/service apache24 restart
+
     /usr/sbin/service vultured start
 else
     echo "\e[31mPasswords mismatch\e[0m"
