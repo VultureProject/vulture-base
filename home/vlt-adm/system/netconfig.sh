@@ -30,7 +30,7 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.net ]; then
     /bin/mv /tmp/rc.conf.network /etc/rc.conf.d/network
 
     /usr/sbin/service netif restart
-    dhcp_list=$(/usr/bin/grep "SYNCDHCP" /etc/rc.conf.d/network | /usr/bin/sed -e 's/.*_\(.*\)="SYNCDHCP"/\1/')
+    dhcp_list=$(/usr/bin/grep -i "ifconfig.*dhcp" /etc/rc.conf.d/network | /usr/bin/sed -e 's/.*_\(.*\)=\(.*\)/\1/' | sort -u)
     for i in ${dhcp_list}; do
          /sbin/dhclient ${i}
     done
