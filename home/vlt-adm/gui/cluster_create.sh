@@ -9,13 +9,13 @@ echo -n "Username: "
 read username
 
 echo -n "Password: "
-stty -echo 
+stty -echo
 read password
 stty echo
 echo ""
 
 echo -n "Confirm Password: "
-stty -echo 
+stty -echo
 read confirm_password
 stty echo
 echo ""

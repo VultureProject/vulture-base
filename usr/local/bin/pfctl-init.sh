@@ -2,7 +2,11 @@
 
 #This script restores a default configuration for PF
 management_ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
-
+# Ip no management IP - exit
+if [ -z "$management_ip" ] ; then
+    /bin/echo "Management IP address is null - please select 'Management' and retry." >> /dev/stderr
+    exit 1
+fi
 /usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip | /usr/bin/grep ":"  > /dev/null 2>&1
 #IPV6 Management address
 if [ "$?" == "0" ]; then

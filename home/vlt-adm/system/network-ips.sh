@@ -40,18 +40,20 @@ if [ "$?" == 0 ]; then
 
     /usr/sbin/service jail restart rsyslog
 
-    /usr/local/bin/pfctl-init.sh
-    /sbin/pfctl -f /usr/local/etc/pf.conf
-
     # The Node has been removed of the replicaset, restart mongodb to re-initiate
     /usr/sbin/jexec mongodb service mongod restart
 
     # If boostrap has already be done,
     if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
         # update node network ips in Mongo
-        /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$management_ip\" ; n.internet_ip = \"$internet_ip\" ; n.backends_outgoing_ip = \"$backends_outgoing_ip\" ; n.logom_outgoing_ip = \"$logom_outgoing_ip\" ; n.save()"
+        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$management_ip\" ; n.internet_ip = \"$internet_ip\" ; n.backends_outgoing_ip = \"$backends_outgoing_ip\" ; n.logom_outgoing_ip = \"$logom_outgoing_ip\" ; n.save()"
         # reload apache service
-        /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from services.apache.apache import reload_service ; import logging ; logger=logging.getLogger('services') ; reload_service(logger)"
+        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from services.apache.apache import reload_service ; import logging ; logger=logging.getLogger('services') ; reload_service(logger)"
+        # reload pf configuration
+        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster ; Cluster.api_request("services.pf.pf.gen_config")'
+
+    else
+        /usr/local/bin/pfctl-init.sh
     fi
 else
     /bin/echo "Invalid IP Address !"

@@ -20,9 +20,9 @@ if [ -f /etc/rc.conf.proxy ]; then
 fi
 
 # Retrieve management IP address
-ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
+management_ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
 # Ip no management IP - exit
-if [ -z "$ip" ] ; then
+if [ -z "$management_ip" ] ; then
     /bin/echo "Management IP address is null - please select 'Management' and retry." >> /dev/stderr
     exit 1
 fi
@@ -131,8 +131,8 @@ chmod 750 ${TARGET}/var/db/vulture-redis/
 chown redis:redis ${TARGET}/var/run/redis/
 chmod 750 ${TARGET}/var/run/redis/
 
-/bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/{{ management_ip }}/${ip}/" > /usr/local/etc/redis/redis.conf
-/bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/{{ management_ip }}/${ip}/" > /usr/local/etc/redis/sentinel.conf
+/bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/redis.conf
+/bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/sentinel.conf
 /usr/sbin/chown -R redis:vlt-conf /usr/local/etc/redis/
 
 /usr/bin/touch ${TARGET}/var/log/redis.log
