@@ -9,29 +9,54 @@ fi
 ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
 . /etc/rc.conf
 
-/bin/echo "::1 localhost" > /etc/hosts
-/bin/echo "127.0.0.1 localhost" >> /etc/hosts
+if ! grep "localhost" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "::1 localhost" >> /etc/hosts
+    /bin/echo "127.0.0.1 localhost" >> /etc/hosts
+fi
+if ! grep "mongodb" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "fd00::202 mongodb" >> /etc/hosts
+    /bin/echo "127.0.0.2 mongodb" >> /etc/hosts
+fi
 
-/bin/echo "fd00::202 mongodb" >> /etc/hosts
-/bin/echo "127.0.0.2 mongodb" >> /etc/hosts
+if ! grep "redis" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "fd00::203 redis" >> /etc/hosts
+    /bin/echo "127.0.0.3 redis" >> /etc/hosts
+fi
 
-/bin/echo "fd00::203 redis" >> /etc/hosts
-/bin/echo "127.0.0.3 redis" >> /etc/hosts
+if ! grep "rsyslog" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "fd00::204 rsyslog" >> /etc/hosts
+    /bin/echo "127.0.0.4 rsyslog" >> /etc/hosts
+fi
 
-/bin/echo "fd00::204 rsyslog" >> /etc/hosts
-/bin/echo "127.0.0.4 rsyslog" >> /etc/hosts
+if ! grep "haproxy" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "fd00::205 haproxy" >> /etc/hosts
+    /bin/echo "127.0.0.5 haproxy" >> /etc/hosts
+fi
 
-/bin/echo "fd00::205 haproxy" >> /etc/hosts
-/bin/echo "127.0.0.5 haproxy" >> /etc/hosts
+if ! grep "apache" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "127.0.0.6 apache" >> /etc/hosts
+    /bin/echo "fd00::206 apache" >> /etc/hosts
+fi
 
-/bin/echo "127.0.0.6 apache" >> /etc/hosts
-/bin/echo "fd00::206 apache" >> /etc/hosts
+if ! grep "portal" /etc/hosts 2>&1 > /dev/null; then
+    /bin/echo "127.0.0.7 portal" >> /etc/hosts
+    /bin/echo "fd00::207 portal" >> /etc/hosts
+fi
 
-/bin/echo "127.0.0.7 portal" >> /etc/hosts
-/bin/echo "fd00::207 portal" >> /etc/hosts
+# If ip already exists in the file, replace the line using ip as match
+if grep -E "^${ip}[[:space:]]" /etc/hosts 2>&1 > /dev/null; then
+    /usr/bin/sed -i '' "/^${ip}[[:space:]]/c\\
+${ip} ${hostname}
+" /etc/hosts
+# If hostname already exists in the file, replace the line using hostname as match
+elif grep -E "[[:space:]]${hostname}$" /etc/hosts 2>&1 > /dev/null; then
+    /usr/bin/sed -i '' "/[[:space:]]${hostname}$/c\\
+${ip} ${hostname}
+" /etc/hosts
+else
+    /bin/echo "${ip} ${hostname}" >> /etc/hosts
+fi
 
-
-/bin/echo "${ip} ${hostname}" >> /etc/hosts
 /bin/echo "${hostname}" > /etc/host-hostname
 
 # Set hostname=127.0.0.2 into MongoDB jail - it can then resolve himself
