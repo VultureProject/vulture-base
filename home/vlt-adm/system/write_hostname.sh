@@ -6,7 +6,7 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
    exit 1
 fi
 
-ip="$(/bin/cat /usr/local/etc/management.ip)"
+ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
 . /etc/rc.conf
 
 /bin/echo "::1 localhost" > /etc/hosts
@@ -40,7 +40,6 @@ ip="$(/bin/cat /usr/local/etc/management.ip)"
 
 #Copy hosts file to jails
 for jail in apache mongodb redis rsyslog haproxy portal; do
-    /bin/cp /usr/local/etc/management.ip /zroot/${jail}/usr/local/etc/management.ip
     /bin/echo "${hostname}" > /zroot/${jail}/etc/host-hostname
     /bin/echo "nameserver ${jail}" > /zroot/${jail}/etc/resolv.conf
 done
