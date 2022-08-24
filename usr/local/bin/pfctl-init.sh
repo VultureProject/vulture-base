@@ -1,9 +1,13 @@
 #!/bin/sh
 
 #This script restores a default configuration for PF
-management_ip="$(/bin/cat /usr/local/etc/management.ip)"
-
-grep ':' /usr/local/etc/management.ip > /dev/null
+management_ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
+# Ip no management IP - exit
+if [ -z "$management_ip" ] ; then
+    /bin/echo "Management IP address is null - please select 'Management' and retry." >> /dev/stderr
+    exit 1
+fi
+/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip | /usr/bin/grep ":"  > /dev/null 2>&1
 #IPV6 Management address
 if [ "$?" == "0" ]; then
     MASQUERADING="nat pass proto tcp from { fd00::202,fd00::203,fd00::204,fd00::205,fd00::206,fd00::207 } to any port 80 -> ${management_ip}  # jails -> HTTP
