@@ -29,7 +29,7 @@ fi
 
 if [ ! -f /var/cache/pkg/base.txz ]; then
 	/bin/echo -n "Downloading base.txz... "
-	/usr/local/bin/wget -O /var/cache/pkg/base.txz ${BASE} || (/bin/echo "Fail !" ; exit 1)
+	/usr/local/bin/wget --progress=dot:giga -O /var/cache/pkg/base.txz ${BASE} || (/bin/echo "Fail !" ; exit 1)
 	/bin/echo "Ok!"
 fi
 
