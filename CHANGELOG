@@ -5,6 +5,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.0.0] - 2022-09-07
+### Removed
+- [DEPRECATED] [UPDATE_SCRIPTS] Removed update_system_lite.sh (update_system.sh can be used to get the same result with the '-u' flag)
+- [PF] [INIT CONFIGURATION] useless NAT rules for DNS
+- [PREDATOR] reputation.sh script to get reputation databases from predator
+- [DASHBOARD] vulture-dashboard does not exist anymore
+- [DEPRECATED] [DOCUMENTATION] GUI/API documentation has been removed
+- [DEPRECATED] [DEFENDER] mod_defender capabilities have been removed
+- [DEPRECATED] [VM] VM capabilities (through bhyve) have been removed
+- [NETWORK] tap0/vm_public interfaces have been removed
+### Changed
+- [HAPROXY] [RSYSLOG TEMPLATES] Updated templates to use correct and updated fields
+- [DNSMASQ] [CONFIGURATION] Several changes to the service configuration file
+  - remove useless DHCP settings
+  - bind service on lo0 instead of tap0
+  - remove 'bind-interfaces' setting
+- [NODE] [STATUS] replaced .node_ok and .install files with database/manage.py checks
+- [JAILS] [RESOLUTION] Update jails' resolv.conf to use loopback interface instead of tap0
+- [JAILS] [CONFIG FILES] Dissociate apache and portal jails' configuration in package
+- [ADMIN][MANAGEMENT] Changed the use of management.ip file to using rc configuration
+- [ADMIN][MANAGEMENT] Added options in the CLI to change:
+  - internet_ip
+  - backends_outgoing_ip
+  - logom_outgoing_ip
+- [ADMIN][MANAGEMENT] Modified management.sh to change the above ips
+- [ADMIN][MANAGEMENT] Renamed management.sh to network-ips.sh
+- [NETWORK-IPS][APACHE] Changed from reloading configuration to reloading the service
+### Added
+- [UPDATE] Restart dnsmasq at the end of the update process, and after upgrading vulture-gui/vulture-base
+- [CLUSTER_CREATE] Restart apache at the end of the cluster creation to reload cluster status in loaded code
+- [RSYSLOG] [TEMPLATES] Missing elastic templates for haproxy log output templates
+- [CHANGELOG] Created file with past known releases
+### Fixed
+- [SYSCTL] Renamed sysctl variable 'net.inet.ip.check_interface' into new 'net.inet.ip.rfc1122_strong_es'
+- [SYSCTL] Removed sysctl variable 'net.inet.tcp.recvbuf_inc=131072'
+- [NETCONFIG] Improved detection of DHCP-enabled interfaces on which to reload dhcp client during network configuration changes
+- [UPDATE_SYSTEM] Ensure no cronjobs are running or can start during upgrades
+
+
 ## [1.3.2] - 2022-08-05
 ### Removed
 - [DOC] Do not specify installing vulture-libtensorflow package in installation instructions
