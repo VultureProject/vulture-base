@@ -1,0 +1,204 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
+## [2.0.0] - 2022-09-07
+### Removed
+- [DEPRECATED] [UPDATE_SCRIPTS] Removed update_system_lite.sh (update_system.sh can be used to get the same result with the '-u' flag)
+- [PF] [INIT CONFIGURATION] useless NAT rules for DNS
+- [PREDATOR] reputation.sh script to get reputation databases from predator
+- [DASHBOARD] vulture-dashboard does not exist anymore
+- [DEPRECATED] [DOCUMENTATION] GUI/API documentation has been removed
+- [DEPRECATED] [DEFENDER] mod_defender capabilities have been removed
+- [DEPRECATED] [VM] VM capabilities (through bhyve) have been removed
+- [NETWORK] tap0/vm_public interfaces have been removed
+### Changed
+- [HAPROXY] [RSYSLOG TEMPLATES] Updated templates to use correct and updated fields
+- [DNSMASQ] [CONFIGURATION] Several changes to the service configuration file
+  - remove useless DHCP settings
+  - bind service on lo0 instead of tap0
+  - remove 'bind-interfaces' setting
+- [NODE] [STATUS] replaced .node_ok and .install files with database/manage.py checks
+- [JAILS] [RESOLUTION] Update jails' resolv.conf to use loopback interface instead of tap0
+- [JAILS] [CONFIG FILES] Dissociate apache and portal jails' configuration in package
+- [ADMIN][MANAGEMENT] Changed the use of management.ip file to using rc configuration
+- [ADMIN][MANAGEMENT] Added options in the CLI to change:
+  - internet_ip
+  - backends_outgoing_ip
+  - logom_outgoing_ip
+- [ADMIN][MANAGEMENT] Modified management.sh to change the above ips
+- [ADMIN][MANAGEMENT] Renamed management.sh to network-ips.sh
+- [NETWORK-IPS][APACHE] Changed from reloading configuration to reloading the service
+### Added
+- [UPDATE] Restart dnsmasq at the end of the update process, and after upgrading vulture-gui/vulture-base
+- [CLUSTER_CREATE] Restart apache at the end of the cluster creation to reload cluster status in loaded code
+- [RSYSLOG] [TEMPLATES] Missing elastic templates for haproxy log output templates
+- [CHANGELOG] Created file with past known releases
+### Fixed
+- [SYSCTL] Renamed sysctl variable 'net.inet.ip.check_interface' into new 'net.inet.ip.rfc1122_strong_es'
+- [SYSCTL] Removed sysctl variable 'net.inet.tcp.recvbuf_inc=131072'
+- [NETCONFIG] Improved detection of DHCP-enabled interfaces on which to reload dhcp client during network configuration changes
+- [UPDATE_SYSTEM] Ensure no cronjobs are running or can start during upgrades
+
+
+## [1.3.2] - 2022-08-05
+### Removed
+- [DOC] Do not specify installing vulture-libtensorflow package in installation instructions
+- [DEPENDENCIES] do not depend on vulture-libtensorflow anymore
+
+
+## [1.3.1] - 2022-06-30
+### Removed
+- [ZAP] all zap files, services and integrations (`deprecated`)
+### Fixed
+- [MKJAIL][APACHE] create timeouts.conf file in apache jail if absent
+- [UPDATE_SYSTEM] use `yes` (/usr/bin/yes) instead of echo to automatically resolve hbsd-update/etcupdate interactive requests during system upgrades
+- [CLOUDINIT] Enable Ec2 datasource (was disabled by default)
+
+
+## [1.3.0] - 2022-06-17
+### Fixed
+- [MKJAIL][PORTAL] add missing python38 package in the portal jail during jail creation
+### Changed
+- [SYSTEM][UPGRADE] Complete rework of update_system.sh
+  - ability to only download packages and system upgrades on a temporary directory
+  - ability to remove/keep temporary directory used during upgrade
+  - ability to use a custom version while upgrading system (compatible with HardenedBSD only)
+  - ability to clean pkg cache (system and jails) after a successful upgrade
+  - ability to specify if DNSSEC should be used during system upgrade (default NO)
+  - ability to only upgrade packages, not system (equivalent to update_system_lite)
+  - ability to only upgrade system and jails, not packages
+  - ability to specify a custom temporary directory
+  - ability to specify an 'automatic' resolution process during HardenedBSD system upgrades (etcupdate resolve strategy) for non-interactive upgrades
+  - WARNING: the script no longer tries system upgrade package validation with DNSSEC, user SHOULD use -d to activate DNSSEC validation when necessary
+  - OBSOLETE: update_system_lite.sh will be obsoleted in the next release
+### Added
+- [CLOUDINIT] basic configuration files for cloud-init integration
+
+
+## [1.2.3] - 2022-06-15
+### Added
+ - [FRONTEND][HAPROXY-LOGS] Add missing fields and microseconds in timestamp
+
+
+## [1.2.2] - 2022-03-31
+### Added
+- [UPGRADE_SCRIPT][MONGO] ensure secadm exceptions are enforced for `mongo` executable in mongodb jail
+- [BOOTSTRAP] Install vulture-haproxy binary dependencies to apache jail (pcre2)
+- [BOOTSTRAP] copy haproxy binary and libraries from vulture-haproxy package to apache jail
+### Removed
+- [BOOTSTRAP] Don't install haproxy package to apache jail
+
+
+## [1.2.1] - 2022-02-21
+### Added
+- [UPGRADE SCRIPT] force disable **mprotect** and **pageexec** protections on mongo executable in mongodb jail
+
+
+## [1.2.0] - 2022-02-03
+### Added
+ - [ADMIN][Restriction] Prevent (mis)use of `pkg upgrade` (use `update_system(_lite).sh` instead)
+### Changed
+ - [PORTAL] Use **[gunicorn](https://docs.gunicorn.org/en/stable/)** instead of **[apache wsgi](https://pypi.org/project/mod-wsgi/)** to host portal engine
+
+
+## [1.1.9] - 2022-01-04
+### Fixed
+ - [LOGROTATE] : Use copytruncate for python logs (/var/log/vulture/os/**.log -> some logs where lost -> django crontabs continued to write into rotated file
+
+
+## [1.1.8] - 2021-11-29
+### Changed
+- [UPGRADE][SCRIPTS] Completely disable Secadm rules on host and in jails before upgrading anything, reactivate the rules at the end
+### Fixed
+- [BOOTSTRAP] Correct name for package 'openldap-client' -> 'openldap24-client'
+
+
+## [1.1.7] - 2021-08-25
+### Fixed
+- [UPGRADE SCRIPTS] disable secadm rules temporarily on host before updating gui to prevent errors while reinstalling python env
+
+
+## [1.1.6] - 2021-08-09
+### Added
+ - [Sudoers] : Add needed rules for filebeat service management
+ - [Filebeat] : Add "filebeat_enable=YES" into Rsyslog make-jail script
+### Fixed
+ - [Netconfig] : Remove duplicated lines in generated /etc/rc.conf.d/network file
+ - [Cluster_join] : Fix script for IPv6 master joining
+ - [Admin.sh/time] : Fix ntp configuration reuse
+ - [Dnsmasq] : Remove useless 'local=/lan/' directive - which caused resolution bugs on *.lan domains
+ - [LogRotate] : Fix permissions on Darwin rotated log files
+### Removed
+ - [Apache/Portal] : Remove obsolete "jpeg" package : replaced by jpeg-turbo
+### Changed
+ - [Admin.sh/upgrade] : Do not use dnssec validation when archive has already been downloaded
+ - [PYTHON] Upgrade python version from 3.7 to 3.8
+
+
+## [1.1.3] - 2021-04-16
+### Fixed
+ - Rsyslog template : Add missing defender_score field in Rsyslog template for haproxy logs sent to Mongodb database
+ - Update : Upgrade darwin before vulture-gui in update_system & update_system_lite, to handle configuration changes
+ - Jails : Install missing needed packages into jails
+
+
+## [1.1.1] - 2021-02-03
+### Removed
+- [HAPROXY LOG TEMPLATES] remove obsoleted/unused fields (haproxy 'http_{receive,response}_time' and 'tcp_request_time')
+- [HAPROXY LOG TEMPLATES] remove obsolete darwin_* fields
+### Fixed
+- [HAPROXY LOG TEMPLATES] safe representation of fields for json format
+- [HAPROXY LOG TEMPLATES] numbers are represented without quotes
+- [HAPROXY LOG TEMPLATES] add missing quotes in some fields
+- [IMPCAP LOG TEMPLATES] safe representation of fields for json format
+- [IMPCAP LOG TEMPLATES] numbers are represented without quotes
+- [IMPCAP LOG TEMPLATES] add missing quotes in some fields
+### Added
+- [HAPROXY LOG TEMPLATES] add redis templates for Darwin context caching
+- [HAPROXY LOG TEMPLATES] add 'advens' enrichment field
+- [IMPCAP LOG TEMPLATES] add 'advens' enrichment field
+
+
+## [1.0.2] - 2020-03-09
+### Added
+- Add OWASP ZAP scanner
+- Add Java dependencies
+- Add dashboard update mechanism
+- Add host's secadm rules
+
+
+## [1.0.1] - 2020-02-27
+### Added
+ - KERNEL : Add support for Kernel tools in install-kernel
+ - KERNEL : Add secadm service (packaged into vulture-kernel)
+ - KERNEL : Add pax exception for node binary
+ - KERNEL : Add pax exception for python binary
+ - APACHE : Add libucl in ApacheJail + secadm support
+ - RSYSLOG : add template for new rsyslog's omhiredis 'set' option
+### Changed
+ - ADMIN.SH : Reload apache config if management ip has changed
+ - ADMIN.SH : Do not start vultured if upgrade is done before install
+ - APACHE : Install radiusclient instead of freeradius-client in Apache/Portal jails (freeradius-client is unfetchable now)
+ - JAILS : Install Hardened base.txz into all jails
+ - JAILS : Install openssl instead of openssl111 into Apache,Portal,Rsyslog jails
+ - KERNEL : Install-kernel now updates gptzfsboot, needed to decrypt ZFS partitions
+ - LOADER.CONF : Load kernel module if_tap (not built-in in Hardened kernel)
+ - PKG : A node support into apache jail for vulture-dashboard
+ - PYTHON : Upgrade python version 3.6 -> 3.7
+ - REDIS : Use /var/db/vulture-redis for database save path (issue with default /var/db/redis path)
+ - RSYSLOG : Install libgcrypt into Rsyslog jail
+ - SHELLINABOX : Rename shellinabox service files to vulture-shellinabox to prevent overwrite by shellinabox official package
+ - VULTURED : Check vultured service status with pid file and not with ps (by default), to solve 'not running' with old python3 env
+### Removed
+- RSYSLOG : Remove 98-pstats conf file, it's a template in vulture-gui now
+### Fixed
+ - ADMIN.SH : Fix creation of '2' files in vlt-adm HOME, caused by dialog
+ - ADMIN.SH : Fix darwin upgrade for version 1.2.1-2
+ - LOGROTATE : Add missing pstats-sec rotation conf
+ - MKJAILS : Add missing option in virtualenv creation
+ - SYSCTL : Fix erroneous oid
+ - SYSCTL : Fix invalid parameter 'kern.timecounter.hardware'

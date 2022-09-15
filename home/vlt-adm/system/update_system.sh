@@ -12,6 +12,7 @@ do_update_packages=1
 download_only=0
 use_dnssec=0
 clean_cache=0
+cron_was_up=0
 
 #############
 # functions #
@@ -112,6 +113,26 @@ initialize() {
             echo "[-] Done."
         done
     fi
+
+    if /usr/sbin/service cron status > /dev/null; then
+        cron_was_up=1
+        process_match="manage.py crontab run "
+        # Disable cron during upgrades
+        echo "[+] Disabling cron..."
+        /usr/sbin/service cron stop
+        if /bin/pgrep -qf "${process_match}"; then
+            echo "[*] Stopping currently running crons..."
+            # TODO uncomment when vulture-gui 2.0.0 has been deployed
+            # # send a SIGTERM to close scripts cleanly, if pwait expires after 10m, force kill all remaining scripts
+            # /bin/pkill -15 -f "${process_match}"
+            if ! /bin/pgrep -f "${process_match}" | /usr/bin/xargs /bin/pwait -t10m; then
+                echo -e "\033[0;31m[!] Some crons still running after 10 minutes, forcing remaining crons to stop!\033[0m"
+                /bin/pgrep -lf "${process_match}"
+                /bin/pkill -9 -lf "${process_match}"
+            fi
+        fi
+        echo "[-] Cron disabled"
+    fi
 }
 
 
@@ -151,6 +172,14 @@ finalize() {
     # Be sure to restart dnsmasq: No side-effect and it deals with dnsmasq configuration changes
     /usr/sbin/service dnsmasq restart
 
+    if [ $cron_was_up -eq 1 ]; then
+        # Restart cron after upgrade
+        echo "[+] Restarting cron..."
+        /usr/sbin/service cron start
+        echo "[-] Cron restarted"
+    fi
+
+    echo "Upgrade finished!"
     exit $err_code
 }
 
