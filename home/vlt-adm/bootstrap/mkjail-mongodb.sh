@@ -9,36 +9,12 @@ fi
 
 JAIL="mongodb"
 TARGET="/zroot/mongodb"
-BASE="https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/base.txz"
-SHA256="$(/usr/local/bin/curl -s -XGET https://ci-01.nyi.hardenedbsd.org/pub/hardenedbsd/12-stable/amd64/amd64/BUILD-LATEST/CHECKSUMS.SHA256 | /usr/bin/grep base.txz | /usr/bin/awk '{print $4}')"
-
 
 if [ -f /etc/rc.conf.proxy ]; then
     . /etc/rc.conf.proxy
     export http_proxy=${http_proxy}
     export https_proxy=${https_proxy}
     export ftp_proxy=${ftp_proxy}
-fi
-
-# If the file already exists
-# And does not have correct shasum - redownload-it
-if [ -f /var/cache/pkg/base.txz ] && \
-   [ "$(/sbin/sha256 -q /var/cache/pkg/base.txz | /usr/bin/sed -e 's/ .*//g')" != "${SHA256}" ]; then
-    /bin/rm -f /var/cache/pkg/base.txz
-fi
-
-if [ ! -f /var/cache/pkg/base.txz ]; then
-	/bin/echo -n "Downloading base.txz... "
-	/usr/local/bin/wget --progress=dot:giga -O /var/cache/pkg/base.txz ${BASE} || (/bin/echo "Fail !" ; exit 1)
-	/bin/echo "Ok!"
-fi
-
-/bin/echo -n "Verifying SHASUM for base.txz... "
-if [ "$(/sbin/sha256 -q /var/cache/pkg/base.txz | /usr/bin/sed -e 's/ .*//g')" != "${SHA256}" ]; then
-	/bin/echo "Bad shasum for base.txz"
-	exit
-else
-	/bin/echo "Ok!"
 fi
 
 /bin/echo -n "Creating jail configuration... "
@@ -57,10 +33,20 @@ if [ "$(/sbin/zfs get mountpoint | /usr/bin/grep ${TARGET})" == "" ] ; then
     /bin/echo "Ok!"
 fi
 
-# If base.txz has not been decompressed
+# Create/decompress base system if not already done
 if [ ! -f "${TARGET}/etc/hosts" ] ; then
-    /bin/echo -n "Decompressing base system to jail..."
-    /usr/bin/tar xf /var/cache/pkg/base.txz -C ${TARGET}
+    /bin/echo "Decompressing base system to jail..."
+    /bin/mkdir -p /tmp/update
+    # -i ignore version check (always install)
+    # -n do not update kernel (useless for jail)
+    # -d do not use DNSSEC
+    # -D do not download update (allows to reuse update from local directory if it already exists)
+    # -T keep downloaded update (allow reuse)
+    # -t specify download directory
+    if ! /usr/sbin/hbsd-update -indDTt /tmp/update -r ${TARGET} > /dev/null ; then
+        /bin/echo "Cache folder doesn't exist yet, downloading and installing..."
+        /usr/sbin/hbsd-update -indTt /tmp/update -r ${TARGET} > /dev/null
+    fi
     /bin/echo "Ok!"
 fi
 
