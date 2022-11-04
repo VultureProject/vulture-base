@@ -54,6 +54,7 @@ if [ "$?" == 0 ]; then
 
     else
         /usr/local/bin/pfctl-init.sh
+        /sbin/pfctl -f /usr/local/etc/pf.conf
     fi
 else
     /bin/echo "Invalid IP Address !"
