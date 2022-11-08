@@ -5,14 +5,24 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
    exit 1
 fi
 
-echo -n "Master hostname: "
-read master_hostname
+master_hostname=$1
+master_ip=$2
+api_key=$3
 
-echo -n "Master IP (without bracket for IPv6):"
-read master_ip
+if [ -z "${master_hostname}" ]; then
+    echo -n "Master hostname: "
+    read master_hostname
+fi
 
-echo -n "Cluster APIKey: "
-read api_key
+if [ -z "${master_ip}" ]; then
+    echo -n "Master IP (without bracket for IPv6):"
+    read master_ip
+fi
+
+if [ -z "${api_key}" ]; then
+    echo -n "Cluster APIKey: "
+    read api_key
+fi
 
 echo "$master_ip    $master_hostname" >> /etc/hosts
 

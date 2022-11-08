@@ -5,20 +5,30 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
    exit 1
 fi
 
-echo -n "Username: "
-read username
+username=$1
+password=$2
+confirm_password=$2
 
-echo -n "Password: "
-stty -echo
-read password
-stty echo
-echo ""
+if [ -z "$username" ]; then
+    echo -n "Username: "
+    read username
+fi
 
-echo -n "Confirm Password: "
-stty -echo
-read confirm_password
-stty echo
-echo ""
+if [ -z "$password" ]; then
+    echo -n "Password: "
+    stty -echo
+    read password
+    stty echo
+    echo ""
+fi
+
+if [ -z "$confirm_password" ]; then
+    echo -n "Confirm Password: "
+    stty -echo
+    read confirm_password
+    stty echo
+    echo ""
+fi
 
 if [ "$password" = "$confirm_password" ]; then
     # Unset proxy to contact the GUI (myself)
