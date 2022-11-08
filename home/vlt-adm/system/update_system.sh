@@ -58,7 +58,15 @@ update_system() {
     jail="$2"
     if [ -f /usr/sbin/hbsd-update ] ; then
         # If a jail is specified, execute update in it
-        if [ -n "$jail" ] ; then options="-j $jail" ; fi
+        if [ -n "$jail" ] ; then
+            if [ -d /.jail_system ]; then
+                # upgrade base jail_system root with local hbsd-update.conf (for "thin" jails)
+                options="-c /.jail_system/etc/hbsd-update.conf -r /.jail_system/"
+            else
+                # use -j flag from hbsd-update to let it handle upgrade of "full" jail
+                options="-j $jail"
+            fi
+        fi
         if [ -n "$system_version" ]; then
             # Add -U as non-last update versions cannot be verified
             echo "[!] Custom version of system update selected, this version will be installed without signature verification!"
