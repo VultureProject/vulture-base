@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+### Removed
+- [JAIL] [APACHE] Disable and uninstall apache from jail
+### Added
+- [JAIL] [APACHE] Install nginx and gunicorn in the apache jail
+- [JAIL] [APACHE] Ensure python is installed in the apache jail
+- [SYSTEM] Create a new /var/sockets/gui folder and mount it RW in the apache jail
+- [SUDO] Allow vlt-os to manage gunicorn/nginx services
+### Changed
+- [UPDATE_SYSTEM] stop/start/reload nginx/gunicorn during system updates
+- [LOGROTATE] reload nginx and gunicorn in the apache jail after rotating gui logs
+
+
 ## [2.0.4] - 2022-11-21
 ### Added
 - [CLOUD_INIT] Default logging configuration
