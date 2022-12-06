@@ -58,7 +58,8 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
         /home/vlt-os/env/bin/python /home/vlt-os/scripts/pki.py
 
         # Apache: Hostname change has no impact
-        /usr/sbin/jexec apache /usr/sbin/service apache24 restart
+        /usr/sbin/jexec apache /usr/sbin/service gunicorn restart
+        /usr/sbin/jexec apache /usr/sbin/service nginx restart
         /usr/sbin/jexec portal /usr/sbin/service gunicorn restart
 
         # MongoDB is restarted "as this"
