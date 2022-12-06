@@ -69,10 +69,8 @@ for option in "syslogd_enable" "sendmail_enable" "sendmail_submit_enable" \
     fi
 done
 
-/bin/echo 'apache24_enable="YES"' > ${TARGET}/etc/rc.conf.d/apache24
-/bin/echo 'apache24_http_accept_enable="YES"' >> ${TARGET}/etc/rc.conf.d/apache24
-/bin/echo 'apache24_profiles="gui"' >> ${TARGET}/etc/rc.conf.d/apache24
-/bin/echo 'apache24_gui_configfile="/usr/local/etc/apache24/gui-httpd.conf"' >> ${TARGET}/etc/rc.conf.d/apache24
+/bin/echo 'gunicorn_enable="YES"' > ${TARGET}/etc/rc.conf.d/gunicorn
+/bin/echo 'nginx_enable="YES"' > ${TARGET}/etc/rc.conf.d/nginx
 
 /bin/echo "Ok!"
 
@@ -92,8 +90,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 
 /usr/sbin/pkg -j ${JAIL} install -y openssl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y wget || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y apache24 || (/bin/echo "Fail !" ; exit 1)
-/usr/sbin/pkg -j ${JAIL} install -y www/mod_wsgi4 || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y nginx || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y acme.sh || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y openldap24-client || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y krb5 || (/bin/echo "Fail !" ; exit 1)
@@ -120,10 +117,6 @@ mkdir -p /zroot/apache/usr/local/lib
 /bin/echo "Ok!"
 
 cp -rf /home/jails.apache/.zfs-source/usr/local/etc/* "${TARGET}/usr/local/etc/"
-if [ ! -f ${TARGET}/usr/local/etc/apache24/extra/timeouts.conf ] ; then
-    /bin/cp /home/jails.apache/.zfs-source/usr/local/etc/apache24/extra/timeouts.conf.sample ${TARGET}/usr/local/etc/apache24/extra/timeouts.conf
-fi
-
 /bin/mkdir ${TARGET}/var/db/pki
 
 #Map Vulture-GUI to the HOST
@@ -169,7 +162,11 @@ jexec ${JAIL} chmod 755 /var/tmp/haproxy
 # Sockets
 /bin/mkdir -p ${TARGET}/var/sockets/redis/
 /bin/mkdir -p ${TARGET}/var/sockets/daemon/
+/bin/mkdir -p ${TARGET}/var/sockets/gui/
 
+/bin/mkdir -p /var/sockets/gui/
+/usr/sbin/chown root:vlt-web /var/sockets/gui/
+/bin/chmod 770 /var/sockets/gui
 
 /bin/echo "Ok !"
 
@@ -188,6 +185,15 @@ for mount_path in "/var/db/pki ${TARGET}/var/db/pki" \
         /sbin/mount_nullfs -o ro,late $mount_path
     fi
 done
+
+# Mounting gui socket as rw
+mount_path="/var/sockets/gui /zroot/apache/var/sockets/gui"
+if [ "$(/usr/bin/grep "$mount_path" "/etc/fstab" 2> /dev/null)" == "" ]  ; then
+    /bin/echo "$mount_path nullfs   rw,late      0       0" >> "/etc/fstab"
+fi
+if [ "$(/sbin/mount -p | /usr/bin/sed -E 's/[[:cntrl:]]+/ /g' | /usr/bin/grep "$mount_path")" == "" ] ; then
+    /sbin/mount_nullfs -o rw,late $mount_path
+fi
 
 #Cleanup
 rm -f /zroot/*/var/cache/pkg/*

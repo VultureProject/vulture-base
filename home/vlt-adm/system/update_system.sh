@@ -358,7 +358,8 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
         update_system "$temp_dir" "portal" || finalize 1 "Failed to install system upgrades in jail portal"
         echo "[-] Ok."
     fi
-    /usr/sbin/jexec apache /usr/sbin/service apache24 restart
+    /usr/sbin/jexec apache /usr/sbin/service gunicorn restart
+    /usr/sbin/jexec apache /usr/sbin/service nginx restart
     /usr/sbin/jexec portal /usr/sbin/service gunicorn restart
     echo "[-] GUI updated."
 fi
