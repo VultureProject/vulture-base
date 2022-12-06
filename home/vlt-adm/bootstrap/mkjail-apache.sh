@@ -99,6 +99,7 @@ jexec ${JAIL} /usr/sbin/pwd_mkdb -p /etc/master.passwd
 /usr/sbin/pkg -j ${JAIL} install -y libucl || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y secadm secadm-kmod || (/bin/echo "Fail !" ; exit 1)
 /usr/sbin/pkg -j ${JAIL} install -y liblognorm || (/bin/echo "Fail !" ; exit 1)
+/usr/sbin/pkg -j ${JAIL} install -y lang/python || (/bin/echo "Fail !" ; exit 1)
 
 # Needed dependency for haproxy package copied from vulture-haproxy
 /usr/sbin/pkg -j ${JAIL} install -y pcre2 || (/bin/echo "Fail !" ; exit 1)
