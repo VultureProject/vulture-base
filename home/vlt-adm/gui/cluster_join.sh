@@ -24,14 +24,19 @@ if [ -z "${api_key}" ]; then
     read api_key
 fi
 
-echo "$master_ip    $master_hostname" >> /etc/hosts
-
-/usr/sbin/service dnsmasq reload
+/home/vlt-os/scripts/add_to_hosts.py "$master_hostname" "$master_ip"
 
 /usr/sbin/jexec redis service redis restart
+/usr/sbin/jexec apache service gunicorn stop
+/usr/sbin/jexec portal service gunicorn stop
+/usr/sbin/service vultured stop
 
 if echo "$master_ip" | grep ":" ; then
     master_ip="[${master_ip}]"
 fi
 
-/zroot/apache/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key" && /usr/sbin/service vultured restart
+/zroot/apache/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key"
+
+/usr/sbin/service vultured start
+/usr/sbin/jexec apache service gunicorn start
+/usr/sbin/jexec portal service gunicorn start

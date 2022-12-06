@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Removed
 - [JAIL] [APACHE] Disable and uninstall apache from jail
+### Fixed
+ [CLUSTER_JOIN] Correctly stop and restart local services during cluster join
+ [CLUSTER_JOIN] Correctly add the master's hostname/ip in /etc/hosts
 ### Added
 - [JAIL] [APACHE] Install nginx and gunicorn in the apache jail
 - [JAIL] [APACHE] Ensure python is installed in the apache jail
