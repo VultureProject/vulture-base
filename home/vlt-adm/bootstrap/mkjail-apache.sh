@@ -163,11 +163,6 @@ jexec ${JAIL} chmod 755 /var/tmp/haproxy
 # Sockets
 /bin/mkdir -p ${TARGET}/var/sockets/redis/
 /bin/mkdir -p ${TARGET}/var/sockets/daemon/
-/bin/mkdir -p ${TARGET}/var/sockets/gui/
-
-/bin/mkdir -p /var/sockets/gui/
-/usr/sbin/chown root:vlt-web /var/sockets/gui/
-/bin/chmod 770 /var/sockets/gui
 
 /bin/echo "Ok !"
 
