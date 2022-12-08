@@ -335,6 +335,8 @@ fi
 if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[+] Updating GUI..."
     if [ $do_update_packages -gt 0 ]; then
+        /usr/sbin/jexec apache /usr/sbin/service gunicorn stop
+        /usr/sbin/jexec portal /usr/sbin/service gunicorn stop
         echo "[+] Updating apache and portal jails' packages..."
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui  || finalize 1 "Failed to upgrade package vulture-gui"
 
