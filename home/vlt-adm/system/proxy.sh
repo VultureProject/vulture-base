@@ -22,7 +22,7 @@ if [ -n "${proxy}" ]; then
         sed -i '' "s+^PKG_ENV.*+PKG_ENV {http_proxy: http://${proxy}, https_proxy: http://${proxy}}+g" /usr/local/etc/pkg.conf
     else
         /bin/echo "" >> /usr/local/etc/pkg.conf
-        /bin/echo "PKG_ENV {http_proxy: http://${proxy},https_proxy: http://${proxy}}+g" >> /usr/local/etc/pkg.conf
+        /bin/echo "PKG_ENV {http_proxy: http://${proxy}, https_proxy: http://${proxy}}" >> /usr/local/etc/pkg.conf
     fi
 else
     /bin/rm /etc/rc.conf.proxy
