@@ -48,7 +48,8 @@ if [ "$?" == 0 ]; then
         # update node network ips in Mongo
         /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$management_ip\" ; n.internet_ip = \"$internet_ip\" ; n.backends_outgoing_ip = \"$backends_outgoing_ip\" ; n.logom_outgoing_ip = \"$logom_outgoing_ip\" ; n.save()"
         # reload apache service
-        /usr/sbin/jexec apache /usr/sbin/service apache24 reload
+        /usr/sbin/jexec apache /usr/sbin/service gunicorn reload
+        /usr/sbin/jexec apache /usr/sbin/service nginx reload
         # reload pf configuration
         /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster ; Cluster.api_request("services.pf.pf.gen_config")'
 
