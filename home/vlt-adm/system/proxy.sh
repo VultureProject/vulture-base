@@ -31,3 +31,7 @@ else
     # update pkg.conf file to force pkg to use proxy
     sed -i '' 's+^PKG_ENV.*+PKG_ENV {}+g' /usr/local/etc/pkg.conf
 fi
+
+if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
+    /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster ; Cluster.api_request("services.pf.pf.gen_config")'
+fi
