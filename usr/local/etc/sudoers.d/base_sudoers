@@ -23,6 +23,7 @@ vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-mongodb.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-redis.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-rsyslog.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-apache.sh
+vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-portal.sh
 
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail start
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail stop
