@@ -61,7 +61,7 @@ update_system() {
         if [ -n "$jail" ] ; then
             if [ -d /.jail_system ]; then
                 # upgrade base jail_system root with local hbsd-update.conf (for "thin" jails)
-                options="-c /.jail_system/etc/hbsd-update.conf -r /.jail_system/"
+                options="-r /.jail_system/"
             else
                 # use -j flag from hbsd-update to let it handle upgrade of "full" jail
                 options="-j $jail"
