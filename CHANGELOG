@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.8] - 2023-01-18
 ### Fixed
 - [UPDATE_SYSTEM] Don't use the jail's hbsd-update.conf file for jail system upgrades
+### Changed
+- [LOADER] Update zfs options to increase ARC size and increase disk performances
 
 
 ## [2.0.7] - 2022-12-21
