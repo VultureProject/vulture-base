@@ -6,8 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [2.0.9] - Unreleased
-### CHANGED
+### Changed
 - [UPDATE_SYSTEM] Reload Haproxy after an upgrade instead of stopping/starting it
+### Added
+- [RSYSLOG] [CONFIG] new static ruleset for haproxy global logs parsing and writing
 
 
 ## [2.0.8] - 2023-01-18
