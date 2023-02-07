@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.0.9] - Unreleased
+### CHANGED
+- [UPDATE_SYSTEM] Reload Haproxy after an upgrade instead of stopping/starting it
+
+
 ## [2.0.8] - 2023-01-18
 ### Fixed
 - [UPDATE_SYSTEM] Don't use the jail's hbsd-update.conf file for jail system upgrades
