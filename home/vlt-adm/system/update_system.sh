@@ -299,8 +299,15 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
                 /usr/sbin/jexec "$jail" /usr/sbin/service sentinel start
                 ;;
             haproxy)
-                # Reload gracefully
-                /usr/sbin/jexec "$jail" /usr/sbin/service haproxy reload
+                if /usr/sbin/jexec "$jail" /usr/sbin/service haproxy status > /dev/null ; then
+                    # Reload gracefully
+                    /bin/echo "[*] reloading haproxy service..."
+                    /usr/sbin/jexec "$jail" /usr/sbin/service haproxy reload
+                else
+                    # Start service
+                    /bin/echo "[*] starting haproxy service..."
+                    /usr/sbin/jexec "$jail" /usr/sbin/service haproxy start
+                fi
                 ;;
             *)
                 /usr/sbin/jexec "$jail" /usr/sbin/service "$jail" restart
