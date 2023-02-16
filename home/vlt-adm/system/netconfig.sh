@@ -10,33 +10,19 @@ if [ "$AUTO" != "yes" ] ; then
     /usr/sbin/bsdinstall netconfig
 fi
 if [ -f /tmp/bsdinstall_etc/rc.conf.net ]; then
-    /bin/cat /tmp/bsdinstall_etc/rc.conf.net >> /etc/rc.conf.d/network
-    if ! ( /usr/bin/grep "ifconfig_lo0=" /etc/rc.conf.d/network > /dev/null 2>&1 )
-    then
-        /bin/echo 'ifconfig_lo0="inet 127.0.0.1 netmask 255.255.255.0"' >> /etc/rc.conf.d/network
-    fi
-    if ! ( /usr/bin/grep "ifconfig_lo0_ipv6=" /etc/rc.conf.d/network > /dev/null 2>&1 )
-    then
-        /bin/echo 'ifconfig_lo0_ipv6="inet6 ::1 prefixlen 128"' >> /etc/rc.conf.d/network
-        /bin/echo 'ifconfig_lo0_alias0="inet6 fd00::201 prefixlen 128"' >> /etc/rc.conf.d/network
-    fi
-    if ! ( /usr/bin/grep "cloned_interfaces=" /etc/rc.conf.d/network > /dev/null 2>&1 )
-    then
-        /bin/echo 'cloned_interfaces="lo1 lo2 lo3 lo4 lo5 lo6"' >> /etc/rc.conf.d/network
-    fi
+    /usr/bin/xargs /usr/sbin/sysrc < /tmp/bsdinstall_etc/rc.conf.net
 
-    # Remove duplicated lines
-    sysrc -f /etc/rc.conf.d/network -ae > /tmp/rc.conf.network
-    /bin/mv /tmp/rc.conf.network /etc/rc.conf.d/network
+    # Set Vulture-specific static network configuration
+    /usr/sbin/sysrc -f /etc/rc.conf.d/network ifconfig_lo0="inet 127.0.0.1 netmask 255.255.255.0"
+    /usr/sbin/sysrc -f /etc/rc.conf.d/network ifconfig_lo0_ipv6="inet6 ::1 prefixlen 128"
+    /usr/sbin/sysrc -f /etc/rc.conf.d/network ifconfig_lo0_alias0="inet6 fd00::201 prefixlen 128"
+    /usr/sbin/sysrc -f /etc/rc.conf.d/network cloned_interfaces="lo1 lo2 lo3 lo4 lo5 lo6"
 
     /usr/sbin/service netif restart
-    dhcp_list=$(/usr/bin/grep -i "ifconfig.*dhcp" /etc/rc.conf.d/network | /usr/bin/sed -e 's/.*_\(.*\)=\(.*\)/\1/' | sort -u)
+    dhcp_list=$(/usr/sbin/sysrc -ae | /usr/bin/grep -i "ifconfig.*dhcp" | /usr/bin/sed -e 's/.*_\(.*\)=\(.*\)/\1/' | sort -u)
     for i in ${dhcp_list}; do
-         /sbin/dhclient ${i}
+         /sbin/dhclient "${i}"
     done
-
-    # Routes needs to be in a separate configuration file
-    /usr/bin/grep route /etc/rc.conf.d/network > /etc/rc.conf.d/routing
 
     # Restart routes
     /usr/sbin/service routing restart
