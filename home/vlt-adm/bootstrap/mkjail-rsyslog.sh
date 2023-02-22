@@ -137,7 +137,6 @@ e2fsprogs-libuuid libmaxminddb hiredis openssl pcre icu cyrus-sasl libestr libgc
 file="/etc/fstab"
 for mount_path in "/usr/local/etc/rsyslog.d ${TARGET}/usr/local/etc/rsyslog.d" \
 "/var/db/pki ${TARGET}/var/db/pki" \
-"/var/log/pf ${TARGET}/var/log/pf" \
 "/var/log/api_parser ${TARGET}/var/log/api_parser" \
 "/var/db/darwin ${TARGET}/var/db/darwin" \
 "/var/sockets/darwin ${TARGET}/var/sockets/darwin" \
@@ -152,13 +151,15 @@ for mount_path in "/usr/local/etc/rsyslog.d ${TARGET}/usr/local/etc/rsyslog.d" \
     fi
 done
 
-mount_path="/var/sockets/rsyslog ${TARGET}/var/sockets/rsyslog"
-if [ "$(/usr/bin/grep "$mount_path" "$file" 2> /dev/null)" == "" ]  ; then
-    /bin/echo "$mount_path nullfs   rw,late      0       0" >> "$file"
-fi
-if [ "$(/sbin/mount -p | /usr/bin/sed -E 's/[[:cntrl:]]+/ /g' | /usr/bin/grep "$mount_path")" == "" ] ; then
-    /sbin/mount_nullfs -o rw,late $mount_path
-fi
+for mount_path in "/var/sockets/rsyslog ${TARGET}/var/sockets/rsyslog" \
+"/var/log/pf ${TARGET}/var/log/pf"; do
+    if [ "$(/usr/bin/grep "$mount_path" "$file" 2> /dev/null)" == "" ]  ; then
+        /bin/echo "$mount_path nullfs   rw,late      0       0" >> "$file"
+    fi
+    if [ "$(/sbin/mount -p | /usr/bin/sed -E 's/[[:cntrl:]]+/ /g' | /usr/bin/grep "$mount_path")" == "" ] ; then
+        /sbin/mount_nullfs -o rw,late $mount_path
+    fi
+done
 
 #Cleanup
 rm -f /zroot/*/var/cache/pkg/*

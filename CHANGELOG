@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - [LOGROTATE] decrease retention time of /var/log/pf/pf.log files to 7
+- [MKJAIL_RSYSLOG] Mount /var/log/pf as RW in Rsyslog jail
 ### Added
 - [LOGROTATE] Add log rotation for new /zroot/rsyslog/var/log/internal/pf.conf parsed pf logs
 
