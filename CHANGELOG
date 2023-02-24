@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [MOTD] Adapt Vulture MOTD to HBSD13
 ### Added
 - [LOGROTATE] Add log rotation for new /zroot/rsyslog/var/log/internal/pf.conf parsed pf logs
+### Removed
+- [SYSTEM] Don't package a custom netif script anymore
 
 
 ## [2.0.9] - 2023-02-16
