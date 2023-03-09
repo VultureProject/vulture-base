@@ -37,7 +37,7 @@ update_repositories() {
         echo -e "${ORANGE}[!] Re-enable them manually once the upgrade is finished!${RESET_COLOR}"
         /usr/bin/sed -i '' 's/enabled\(.*\)yes/enabled\1no/' ${prefix_dir}/usr/local/etc/pkg/repos/*.conf
         if [ -e ${prefix_dir}/usr/local/etc/pkg/repos/vulture.conf ]; then
-            /bin/mv -f "${prefix_dir}/usr/local/etc/pkg/repos/vulture.conf" "${prefix_dir}/usr/local/etc/pkg/repos/vulture.disabled.conf"
+            /bin/rm -f "${prefix_dir}/usr/local/etc/pkg/repos/vulture.conf"
         fi
         /bin/echo "[-] Done"
     fi
