@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Added
 - [UPGRADE] [HBSD13] Add a script to register new Vulture's HBSD13 own repositories (and disable previous ones)
+- [UPGRADE] [HBSD13] Add an upgrade script to go from HBSD12 to HBSD13 (and switch to Vulture's own repositories)
 
 
 ## [2.0.11] - 2023-03-01
