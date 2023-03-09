@@ -23,3 +23,7 @@ o Source project is available on Github : [4m[38;5;33mhttps://github.com/Vultu
 [38;5;214m###                                                                      ###
 [38;5;220m############################################################################
 [0m
+
+[0;31mYour system can be upgraded to HardenedBSD 13!
+Please launch /home/vlt-adm/system/upgrade_to_13.sh to start the upgrade
+Be wary that the appliance will become unavailable and will restart a couple of times![0m
