@@ -34,17 +34,29 @@ usage() {
 
 download_system_update() {
     download_dir="$1"
+    jail="$2"
 
     if [ -f /usr/sbin/hbsd-update ] ; then
         options=""
         if [ $use_dnssec -eq 0 ]; then options="-d"; fi
+        if [ -n "$jail" ] ; then
+            if [ -d /.jail_system ]; then
+                # upgrade base jail_system root with local hbsd-update.conf (for "thin" jails)
+                options="-r /.jail_system/"
+            else
+                # use -j flag from hbsd-update to let it handle upgrade of "full" jail
+                options="-j $jail"
+            fi
+        fi
         if [ -n "$system_version" ]; then
             # Add -U as non-last update versions cannot be verified
             echo "[!] Custom version of system update selected, this version will be installed without signature verification!"
             options="${options} -v $system_version -U"
         fi        # Store (-t) and keep (-T) downloads to $download_dir for later use
         # Do not install update yet (-f)
-        /usr/sbin/hbsd-update -t "$download_dir" -T -f $options
+        if [ ! -f ${download_dir}/update.tar ]; then
+            /usr/sbin/hbsd-update -t "$download_dir" -T -f $options
+        fi
         if [ $? -ne 0 ] ; then return 1 ; fi
     else
         /usr/sbin/freebsd-update --not-running-from-cron fetch > /dev/null
@@ -251,12 +263,8 @@ if [ $download_only -gt 0 ]; then
 fi
 
 if [ $do_update_system -gt 0 ]; then
-    if [ ! -f ${temp_dir}/update.tar ]; then
-        /bin/echo "[+] Downloading system updates..."
-        download_system_update ${temp_dir} || finalize 1 "Failed to download system upgrades"
-        /bin/echo "[-] Done."
-    fi
     /bin/echo "[+] Updating system..."
+    download_system_update ${temp_dir} || finalize 1 "Failed to download system upgrades"
     update_system ${temp_dir} || finalize 1 "Failed to install system upgrades"
     /bin/echo "[-] Done."
 fi
@@ -268,6 +276,7 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
 
         if [ $do_update_system -gt 0 ]; then
             /bin/echo "[+] Updating jail $jail base system files..."
+            download_system_update "$temp_dir" "$jail" || finalize 1 "Failed to download system upgrades for jail ${jail}"
             update_system "$temp_dir" "$jail" || finalize 1 "Failed to install system upgrades in jail ${jail}"
             echo "[-] Ok."
         fi
@@ -355,9 +364,11 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
 
     if [ $do_update_system -gt 0 ]; then
         echo "[+] Updating jail apache base system files..."
+        download_system_update "$temp_dir" "apache" || finalize 1 "Failed to download system upgrades for jail apache"
         update_system "$temp_dir" "apache" || finalize 1 "Failed to install system upgrades in jail apache"
         echo "[-] Ok."
         echo "[+] Updating jail portal base system files..."
+        download_system_update "$temp_dir" "portal" || finalize 1 "Failed to download system upgrades for jail portal"
         update_system "$temp_dir" "portal" || finalize 1 "Failed to install system upgrades in jail portal"
         echo "[-] Ok."
     fi

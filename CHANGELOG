@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [UPGRADE] [HBSD13] Add an upgrade script to go from HBSD12 to HBSD13 (and switch to Vulture's own repositories)
 ### Changed
 - [SYSTEM] [MOTD] Updated MOTD to notify about new script to upgrade to HBSD13
+### Fixed
+- [UPDATE] [SYSTEM] Ensure system update is downloaded before trying to upgrade the system or a jail
 
 
 ## [2.0.11] - 2023-03-01
