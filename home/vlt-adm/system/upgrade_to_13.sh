@@ -25,7 +25,7 @@ update_system(){
         options="-j $jail"
     fi
     /bin/echo "[+] Updating base system..."
-    /usr/bin/yes "tf" | /usr/sbin/hbsd-update -d -t "$temp_dir" -T -D $options || finalize 1  "[/] System update failed"
+    /usr/bin/yes "mf" | /usr/sbin/hbsd-update -d -t "$temp_dir" -T -D $options || finalize 1  "[/] System update failed"
     /bin/echo "[-] Done with update"
 }
 
@@ -91,6 +91,7 @@ restart_and_continue(){
     /bin/echo "[+] Setting up startup script to continue upgrade..."
     # enable script to be run on startup
     /bin/echo "@reboot root sleep 10 && /bin/sh $SCRIPT" > /etc/cron.d/vulture_update || finalize 1  "[/] Failed to setup startup script"
+    /usr/bin/touch ${temp_dir}/upgrading
     # Add a temporary message to end of MOTD to warn about the ongoing upgrade
     /usr/bin/sed -i '' '$s/.*/[5m[38;5;196mUpgrade in progress, your machine will reboot shortly, please wait patiently![0m/' /etc/motd.template
     /bin/echo "[-] Ok"
@@ -154,6 +155,13 @@ finalize() {
     rm -f /etc/cron.d/vulture_update
 
     exit $err_code
+}
+
+usage() {
+    /bin/echo "USAGE ${0} [-y]"
+    /bin/echo "OPTIONS:"
+    /bin/echo "	-y	start the upgrade whitout asking for user confirmation (implicit consent)"
+    exit 1
 }
 
 initialize() {
@@ -238,10 +246,60 @@ stop_services(){
     /bin/echo "[-] Done"
 }
 
+if [ ! -e ${temp_dir}/upgrading ] ; then
+    _run_ok=0
 
-initialize
+    while getopts "y" flag;
+    do
+        case "${flag}" in
+            y) _run_ok=1;
+            ;;
+            *) usage;
+            ;;
+        esac
+    done
 
-if [ "$(uname -K)" -gt 1300000 ] ; then
+    answer=""
+    if [ $_run_ok -ne 1 ]; then
+        /bin/echo -n "Do you wish to upgrade your node? It will become unavailable while it downloads and installs upgrades for the base system, jails and packages! [yN]: "
+        read -r  answer
+        case "${answer}" in
+            y|Y|yes|Yes|YES)
+            # Do nothing, continue
+            ;;
+            *)  /bin/echo "Upgrade canceled."
+                exit 0;
+            ;;
+        esac
+    fi
+
+    if [ "$(uname -K)" -gt 1300000 ]; then
+        /bin/echo "Your system seems to already be on HBSD13, nothing to do!"
+        exit 0
+    else
+        initialize
+
+        check_preconditions
+
+        /bin/echo "Upgrade started!"
+
+        # Updating repositories for host
+        ${FOLDER}/register_vulture_repos.sh
+        # Updating repositories for each jail
+        for jail in "portal" "apache" "haproxy" "rsyslog" "redis" "mongodb"; do
+            ${FOLDER}/register_vulture_repos.sh /zroot/${jail}
+            update_system $jail
+        done
+
+        # Updating HardenedBSD system
+        update_system
+        /bin/echo "[-] Done updating host system"
+
+        restart_and_continue
+    fi
+else
+    initialize
+
     log_file=/var/log/upgrade_to_13.log
     /bin/echo "Output will be sent to $log_file"
 
@@ -259,21 +317,3 @@ if [ "$(uname -K)" -gt 1300000 ] ; then
 
     clean_and_restart
 fi
-
-check_preconditions
-
-/bin/echo "Upgrade started!"
-
-# Updating repositories for host
-${FOLDER}/register_vulture_repos.sh
-# Updating repositories for each jail
-for jail in "portal" "apache" "haproxy" "rsyslog" "redis" "mongodb"; do
-    ${FOLDER}/register_vulture_repos.sh /zroot/${jail}
-    update_system $jail
-done
-
-# Updating HardenedBSD system
-update_system
-/bin/echo "[-] Done updating host system"
-
-restart_and_continue

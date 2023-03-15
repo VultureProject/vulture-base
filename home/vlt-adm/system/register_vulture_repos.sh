@@ -32,21 +32,23 @@ finalize() {
 
 update_repositories() {
     prefix_dir="$1"
+    _log_header=""
+    if [ -n "$prefix_dir" ]; then
+        _log_header="[${prefix_dir}]"
+    fi
     if [ -d ${prefix_dir}/usr/local/etc/pkg/repos/ ]; then
-        echo -e "${ORANGE}[!] Disabling custom repos in ${prefix_dir}/usr/local/etc/pkg for the upgrade${RESET_COLOR}"
-        echo -e "${ORANGE}[!] Re-enable them manually once the upgrade is finished!${RESET_COLOR}"
+        /usr/bin/printf "\033[38;5;172m[!]${_log_header} Disabling custom repos in ${prefix_dir}/usr/local/etc/pkg\033[0m\n"
         /usr/bin/sed -i '' 's/enabled\(.*\)yes/enabled\1no/' ${prefix_dir}/usr/local/etc/pkg/repos/*.conf
         if [ -e ${prefix_dir}/usr/local/etc/pkg/repos/vulture.conf ]; then
             /bin/rm -f "${prefix_dir}/usr/local/etc/pkg/repos/vulture.conf"
         fi
-        /bin/echo "[-] Done"
+        /bin/echo "[-]${_log_header} Done"
     fi
 
-    echo -e "${ORANGE}[!] Disabling HardenedBSD default repo, delete ${prefix_dir}/usr/local/etc/pkg/repos/HardenedBSD.disabled.conf to re-enable it${RESET_COLOR}"
     /bin/mkdir -p "${prefix_dir}/usr/local/etc/pkg/repos"
-    /bin/echo "HardenedBSD: { enabled: no }" > ${prefix_dir}/usr/local/etc/pkg/repos/HardenedBSD.disabled.conf
+    /usr/bin/printf "# HardenedBSD are now disabled by default on Vulture\n# Vulture repositories should be enough to go by, but you can delete this file if you want to enable default HBSD repos again\nHardenedBSD: { enabled: no }\n" > ${prefix_dir}/usr/local/etc/pkg/repos/HardenedBSD.disabled.conf
 
-    /bin/echo "[*] Backing up default configurations:"
+    /bin/echo -n "[*]${_log_header} Backing up default configurations:"
     for conf in ${prefix_dir}/etc/hbsd-update*.conf ; do
         conf=$(basename ${conf})
         if [ ! -f ${prefix_dir}/var/backups/${conf}.bak ]; then
@@ -54,14 +56,15 @@ update_repositories() {
             /bin/mv "${prefix_dir}/etc/$conf" "${prefix_dir}/var/backups/${conf}.bak"
         fi
     done
-    /bin/echo "[*] Backups kept at ${prefix_dir}/var/backups/"
-    /bin/echo "[-] Done"
+    /bin/echo "."
+    /bin/echo "[*]${_log_header} Backups kept at ${prefix_dir}/var/backups/"
+    /bin/echo "[-]${_log_header} Done"
 
-    /bin/echo -n "[+] Updating repositories "
+    /bin/echo -n "[+]${_log_header} Updating repositories "
     if [ -n "$prefix_dir" ]; then
-        /bin/echo "at $prefix_dir"
+        /bin/echo -n "at $prefix_dir"
     else
-        /bin/echo "on system"
+        /bin/echo -n "on system"
     fi
 
     if [ ! -f ${temp_dir}/${vulture_conf} ]; then
