@@ -4,7 +4,7 @@
 # variables #
 #############
 temp_dir=""
-resolve_strategy=""
+resolve_strategy="mf"
 system_version=""
 keep_temp_dir=0
 do_update_system=1
@@ -28,7 +28,7 @@ usage() {
     echo "	-u	do not update system/kernel, only update packages"
     echo "	-s	do not update packages, only update system/kernel"
     echo "	-t tmpdir	temporary directory to use (default is /tmp/vulture_update/, only available on HBSD)"
-    echo "	-r strategy	(non-interactive) resolve strategy to pass to hbsd-update script while upgrading system configuration files (see man etcupdate for more info)"
+    echo "	-r strategy	(non-interactive) resolve strategy to pass to hbsd-update script while upgrading system configuration files (see man etcupdate for more info, default is 'mf')"
     exit 1
 }
 

@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Changed
+- [UPDATE] [SYSTEM] Default base upgrade merge strategy is now 'mine-full' (keep local versions)
 ### Fixed
 - [UPDATE] [SYSTEM] Ensure options used during hbsd-update are all kept for jails' upgrades
 
