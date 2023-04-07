@@ -17,8 +17,10 @@ check_jails() {
         # /usr/bin/clear
 
         if [ ! -d /zroot/${jail} ]; then
-            /bin/echo "Updating jail ${jail} ..."
-                /usr/local/bin/sudo /home/vlt-adm/bootstrap/mkjail-${jail}.sh
+            # /bin/echo "Updating jail ${jail} ..."
+            # /usr/local/bin/sudo /home/vlt-adm/bootstrap/mkjail-${jail}.sh
+            /bin/echo "ERROR: Your vulture installation does not comply with standards"
+            /bin/echo "Please contact the vulture team to report this incident"
         fi
 
     done
