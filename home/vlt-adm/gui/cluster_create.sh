@@ -46,7 +46,7 @@ if [ "$password" = "$confirm_password" ]; then
     # Restart apache service to refresh code and conf
     /usr/sbin/jexec apache /usr/sbin/service gunicorn restart
 
-    /usr/sbin/service vultured status || /usr/sbin/service vultured start
+    /usr/sbin/service vultured restart || /usr/sbin/service vultured start
 else
     echo "\e[31mPasswords mismatch\e[0m"
     exit 1
