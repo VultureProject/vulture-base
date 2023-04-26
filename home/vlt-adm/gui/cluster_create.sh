@@ -41,14 +41,14 @@ if [ "$password" = "$confirm_password" ]; then
     curl -XGET -kw "Status  code : %{http_code}\n"  -o /dev/null https://$(hostname):8000/ 2> /dev/null
 
     /usr/sbin/jexec redis service redis restart
-    /home/jails.apache/.zfs-source/home/vlt-os/bootstrap/cluster_create $username $password
+    /home/jails.apache/.zfs-source/home/vlt-os/bootstrap/cluster_create $username $password || exit 2
 
     # Restart apache service to refresh code and conf
     /usr/sbin/jexec apache /usr/sbin/service gunicorn restart
 
-    /usr/sbin/service vultured start
+    /usr/sbin/service vultured restart || /usr/sbin/service vultured start
 else
     echo "\e[31mPasswords mismatch\e[0m"
-    exit
+    exit 1
 fi
 
