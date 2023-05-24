@@ -7,6 +7,7 @@ COLOR_OFF='\033[0m'
 COLOR_RED='\033[0;31m'
 
 temp_dir="/var/tmp/update"
+new_be="Vulture-HBSD13-$(date -Idate)"
 
 download_system_update(){
     if [ ! -f ${temp_dir}/update.tar ]; then
@@ -22,7 +23,10 @@ update_system(){
     options=""
     jail="$1"
     if [ -n "$jail" ] ; then
-        options="-j $jail"
+        options="${options} -n -j $jail"
+    else
+        new_be="Vulture-HBSD13-$(date -Idate)"
+        options="${options} -b $new_be"
     fi
     /bin/echo "[+] Updating base system..."
     /usr/bin/yes "mf" | /usr/sbin/hbsd-update -d -t "$temp_dir" -T -D $options || finalize 1  "[/] System update failed"
@@ -90,10 +94,13 @@ update_packages(){
 restart_and_continue(){
     /bin/echo "[+] Setting up startup script to continue upgrade..."
     # enable script to be run on startup
-    /bin/echo "@reboot root sleep 10 && /bin/sh $SCRIPT" > /etc/cron.d/vulture_update || finalize 1  "[/] Failed to setup startup script"
+    tmp_be_mount="$(/usr/bin/mktemp -d)"
+    /sbin/bectl mount "$new_be" "$tmp_be_mount" || finalize 1 "Could not mount Boot Environment"
+    /bin/echo "@reboot root sleep 10 && /bin/sh $SCRIPT" > "${tmp_be_mount}/etc/cron.d/vulture_update" || finalize 1  "[/] Failed to setup startup script"
+    /sbin/bectl umount "$new_be"
     /usr/bin/touch ${temp_dir}/upgrading
     # Add a temporary message to end of MOTD to warn about the ongoing upgrade
-    /usr/bin/sed -i '' '$s/.*/[5m[38;5;196mUpgrade in progress, your machine will reboot shortly, please wait patiently![0m/' /etc/motd.template
+    /usr/bin/sed -i '' '$s/.*/[5m[38;5;196mUpgrade in progress, your machine will reboot shortly, please wait patiently![0m/' "${tmp_be_mount}/etc/motd.template"
     /bin/echo "[-] Ok"
     /bin/echo "[+] Rebooting system"
     /sbin/shutdown -r now
@@ -114,6 +121,11 @@ clean_and_restart() {
 
     /bin/echo "" >> /etc/motd.template
     /usr/bin/sed -i '' '$s/.*/[38;5;10mYour system is now on HardenedBSD 13, welcome back![0m/' /etc/motd.template
+
+    echo -e "${COLOR_RED}"
+    /bin/echo "WARNING: a new Boot Environment was created during the upgrade, please review existing BEs and delete those no longer necessary!"
+    /sbin/bectl list -H
+    echo -e "${COLOR_OFF}"
 
     /bin/echo "[+] Rebooting system"
     /sbin/shutdown -r now
