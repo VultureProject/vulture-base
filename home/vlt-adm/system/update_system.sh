@@ -266,6 +266,14 @@ if [ $do_update_system -gt 0 ]; then
     /bin/echo "[+] Updating system..."
     download_system_update ${temp_dir} || finalize 1 "Failed to download system upgrades"
     update_system ${temp_dir} || finalize 1 "Failed to install system upgrades"
+    secadm_version="$(/usr/sbin/pkg query '%At:%Av' secadm | /usr/bin/grep "FreeBSD_version" | /usr/bin/cut -d : -f 2)"
+    if [ -n "$secadm_version" ] && [ "$secadm_version" -lt "$(uname -U)" ]; then
+        echo "Forcing upgrade of secadm packages (kernel version mismatch)"
+        /usr/sbin/pkg upgrade -yf secadm secadm-kmod
+        for jail in "haproxy" "apache" "portal" "mongodb" "redis" "rsyslog" ; do
+            /usr/sbin/pkg -j "$jail" upgrade -yf secadm secadm-kmod
+        done
+    fi
     /bin/echo "[-] Done."
 fi
 
