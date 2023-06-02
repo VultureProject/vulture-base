@@ -134,6 +134,11 @@ initialize() {
         done
     fi
 
+    # Unlock Vulture packages
+    echo "[+] Unlocking Vulture packages..."
+    /usr/sbin/pkg unlock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
+    echo "[-] Done."
+
     if /usr/sbin/service cron status > /dev/null; then
         cron_was_up=1
         process_match="manage.py crontab run "
@@ -188,6 +193,11 @@ finalize() {
             echo "[-] Done."
         done
     fi
+
+    # Lock Vulture packages
+    echo "[+] Lock Vulture packages..."
+    /usr/sbin/pkg lock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
+    echo "[-] Done."
 
     # Be sure to restart dnsmasq: No side-effect and it deals with dnsmasq configuration changes
     /usr/sbin/service dnsmasq restart
