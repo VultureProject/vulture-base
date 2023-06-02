@@ -22,7 +22,10 @@ update_system(){
     options=""
     jail="$1"
     if [ -n "$jail" ] ; then
-        options="-j $jail"
+        options="${options} -n -j $jail"
+    else
+        new_be="Vulture-HBSD13-$(date +%Y%m%d%H%M%S)"
+        options="${options} -b $new_be"
     fi
     /bin/echo "[+] Updating base system..."
     /usr/bin/yes "mf" | /usr/sbin/hbsd-update -d -t "$temp_dir" -T -D $options || finalize 1  "[/] System update failed"
@@ -47,17 +50,10 @@ update_packages(){
     done
     /bin/echo "[-] Done"
 
-    /bin/echo "[+] Updating vulture-base"
-    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy vulture-base
-    /bin/echo "[-] Done"
-
-    /bin/echo "[+] Reloading dnsmasq..."
-    # Ensure dnsmasq config is up-to-date, as it could be modified during vulture-base upgrade
-    /usr/sbin/service dnsmasq reload || /usr/sbin/service dnsmasq restart
-    /bin/echo "[-] Done"
-
     /bin/echo "[+] Upgrading host system packages"
+    /usr/sbin/pkg unlock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
     IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy
+    /usr/sbin/pkg lock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
     /bin/echo "[-] Done"
 
     /bin/echo "[+] Reloading dnsmasq..."
@@ -90,10 +86,15 @@ update_packages(){
 restart_and_continue(){
     /bin/echo "[+] Setting up startup script to continue upgrade..."
     # enable script to be run on startup
-    /bin/echo "@reboot root sleep 10 && /bin/sh $SCRIPT" > /etc/cron.d/vulture_update || finalize 1  "[/] Failed to setup startup script"
-    /usr/bin/touch ${temp_dir}/upgrading
+    tmp_be_mount="$(/usr/bin/mktemp -d)"
+    /sbin/bectl mount "$new_be" "$tmp_be_mount" || finalize 1 "Could not mount Boot Environment"
+    /bin/echo "@reboot root sleep 30 && /bin/sh $SCRIPT" > "${tmp_be_mount}/etc/cron.d/vulture_update" || finalize 1  "[/] Failed to setup startup script"
     # Add a temporary message to end of MOTD to warn about the ongoing upgrade
-    /usr/bin/sed -i '' '$s/.*/[5m[38;5;196mUpgrade in progress, your machine will reboot shortly, please wait patiently![0m/' /etc/motd.template
+    /usr/bin/sed -i '' '$s/.*/[5m[38;5;196mUpgrade in progress, your machine will reboot shortly, please wait patiently![0m/' "${tmp_be_mount}/etc/motd.template"
+    /usr/bin/sed -i '' 's+welcome=/etc/motd+welcome=/var/run/motd+' "${tmp_be_mount}/etc/login.conf"
+    /usr/bin/cap_mkdb "${tmp_be_mount}/etc/login.conf"
+    /sbin/bectl umount "$new_be"
+    /usr/bin/touch ${temp_dir}/upgrading
     /bin/echo "[-] Ok"
     /bin/echo "[+] Rebooting system"
     /sbin/shutdown -r now
@@ -115,6 +116,11 @@ clean_and_restart() {
     /bin/echo "" >> /etc/motd.template
     /usr/bin/sed -i '' '$s/.*/[38;5;10mYour system is now on HardenedBSD 13, welcome back![0m/' /etc/motd.template
 
+    /usr/bin/printf "${COLOR_RED}"
+    /bin/echo "WARNING: a new Boot Environment was created during the upgrade, please review existing BEs and delete those no longer necessary!"
+    /sbin/bectl list -H
+    /usr/bin/printf "${COLOR_OFF}"
+
     /bin/echo "[+] Rebooting system"
     /sbin/shutdown -r now
 
@@ -129,7 +135,7 @@ finalize() {
 
     if [ -n "$err_message" ]; then
         /bin/echo ""
-        /bin/echo "[!] ${COLOR_RED}${err_message}${COLOR_OFF}"
+        /usr/bin/printf "[!] ${COLOR_RED}${err_message}${COLOR_OFF}\n"
         /bin/echo ""
     fi
 
@@ -170,7 +176,7 @@ initialize() {
         exit 1
     fi
 
-    trap finalize SIGINT
+    trap finalize INT
 
     if [ -f /etc/rc.conf.proxy ]; then
         . /etc/rc.conf.proxy
@@ -198,9 +204,9 @@ initialize() {
 check_preconditions(){
     if /usr/sbin/pkg version -qRl '<' | grep 'vulture-' > /dev/null; then
         # Show necessary packages to be updated
-        echo -e "${COLOR_RED}"
+        /usr/bin/printf "${COLOR_RED}"
         /usr/sbin/pkg version -qRl '<' | grep 'vulture-'
-        echo -e "${COLOR_OFF}"
+        /usr/bin/printf "${COLOR_OFF}"
         finalize 1 "Some packages are not up to date, please run /home/vlt-adm/system/update_system.sh before trying to migrate"
     fi
 }
@@ -211,6 +217,26 @@ stop_services(){
     /bin/echo "[+] Stopping vultured..."
     /usr/sbin/service vultured stop || /usr/bin/true
     /bin/echo "[-] Done"
+
+    # Crontabs
+    if /usr/sbin/service cron status > /dev/null; then
+        /bin/echo "[+] Stopping crontabs..."
+        process_match="manage.py crontab run "
+        # Disable cron during upgrades
+        echo "[+] Disabling cron..."
+        /usr/sbin/service cron stop
+        if /bin/pgrep -qf "${process_match}"; then
+            echo "[*] Stopping currently running crons..."
+            # # send a SIGTERM to close scripts cleanly, if pwait expires after 10m, force kill all remaining scripts
+            /bin/pkill -15 -f "${process_match}"
+            if ! /bin/pgrep -f "${process_match}" | /usr/bin/xargs /bin/pwait -t10m; then
+                /usr/bin/printf "\033[0;31m[!] Some crons still running after 10 minutes, forcing remaining crons to stop!\033[0m\n"
+                /bin/pgrep -lf "${process_match}"
+                /bin/pkill -9 -lf "${process_match}"
+            fi
+        fi
+        echo "[-] Cron disabled"
+    fi
 
     # Apache
     /bin/echo "[+] [apache] Stopping nginx..."

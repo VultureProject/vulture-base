@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [UPDATE_SYSTEM] Properly stop crontabs during upgrades
 ### Fixed
 - [UPDATE_SYSTEM] Ensure secadm version stays up-to-date with the kernel version
+- [UPGRADE_TO_13] Use Boot Environments to have a safer upgrade
 
 
 ## [2.1.1] - 2023-03-30
