@@ -147,9 +147,8 @@ initialize() {
         /usr/sbin/service cron stop
         if /bin/pgrep -qf "${process_match}"; then
             echo "[*] Stopping currently running crons..."
-            # TODO uncomment when vulture-gui 2.0.0 has been deployed
-            # # send a SIGTERM to close scripts cleanly, if pwait expires after 10m, force kill all remaining scripts
-            # /bin/pkill -15 -f "${process_match}"
+            # send a SIGTERM to close scripts cleanly, if pwait expires after 10m, force kill all remaining scripts
+            /bin/pkill -15 -f "${process_match}"
             if ! /bin/pgrep -f "${process_match}" | /usr/bin/xargs /bin/pwait -t10m; then
                 echo -e "\033[0;31m[!] Some crons still running after 10 minutes, forcing remaining crons to stop!\033[0m"
                 /bin/pgrep -lf "${process_match}"
