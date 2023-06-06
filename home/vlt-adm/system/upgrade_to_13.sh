@@ -7,6 +7,7 @@ COLOR_OFF='\033[0m'
 COLOR_RED='\033[0;31m'
 
 temp_dir="/var/tmp/update"
+new_be="Vulture-HBSD13-$(date -Idate)"
 
 download_system_update(){
     if [ ! -f ${temp_dir}/update.tar ]; then

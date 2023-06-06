@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [UPGRADE_TO_13] Use Boot Environments to have a safer upgrade
 
 
+## [2.1.2] - 2023-05-24
+### Fixed
+- [UPGRADE_TO_13] Use a Boot Environment to avoid problems during system upgrade
+### Changed
+- [LOADER] Update loader.conf to reflect changes made on Vulture OS/release
+- [ADMIN] Deprecate use of mkjail_* scripts
+- [CLUSTER_CREATE] Improve script by returning status code
+- [CLUSTER_CREATE] Correctly handle vultured start/restart at the end of the script
+
+
 ## [2.1.1] - 2023-03-30
 ### Changed
 - [UPDATE] [SYSTEM] Default base upgrade merge strategy is now 'mine-full' (keep local versions)
