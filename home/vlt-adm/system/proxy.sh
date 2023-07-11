@@ -4,8 +4,7 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
    /bin/echo "This script must be run as root" 1>&2
    exit 1
 fi
-
-proxy="$1"
+proxy="${1#*://}"
 
 export http_proxy=http://${proxy}
 export https_proxy=http://${proxy}
