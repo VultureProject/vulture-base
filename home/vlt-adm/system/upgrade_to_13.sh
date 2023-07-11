@@ -302,6 +302,7 @@ if [ ! -e ${temp_dir}/upgrading ] ; then
 
     if [ "$(uname -K)" -gt 1300000 ]; then
         /bin/echo "Your system seems to already be on HBSD13, nothing to do!"
+        /usr/bin/head -25 /etc/motd > /etc/motd.template
         exit 0
     else
         initialize
