@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - [HAPROXY] [RSYSLOG_TEMPLATES] Update templates to use new <name>_json versions
+### Removed
+- [SYSCTL] Obsolete parameter 'net.inet.ip.rfc1122_strong_es'
 
 
 ## [2.1.4] - 2023-07-11
