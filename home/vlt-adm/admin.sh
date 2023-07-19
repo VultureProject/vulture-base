@@ -78,7 +78,7 @@ do
                     /bin/rm -f "$tmp_file"
 
                     management_ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"
-                    if [ "$?" == 1 ]; then
+                    if [ "$?" = 1 ]; then
                         management_ip="$(/sbin/ifconfig | /usr/bin/grep inet | /usr/bin/grep -v '127.0.0.1' | /usr/bin/grep -v ' ::1 ' \
                         | /usr/bin/grep -v 'fe80:' | /usr/bin/awk '{print $2}' | /usr/bin/awk -vRS="" -vOFS=' ' '$1=$1' | cut -d " " -f1)"
                     fi
@@ -104,17 +104,17 @@ do
 
                         /bin/rm "$tmp_file"
 
-                        if !(echo "$management_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                        if ! (echo "$management_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
                             /usr/bin/dialog --msgbox "Management IP format incorrect" 8 60
-                        elif !(echo "$internet_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                        elif ! (echo "$internet_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
                             /usr/bin/dialog --msgbox "Internet IP format incorrect" 8 60
-                        elif  !(echo "$backends_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                        elif  ! (echo "$backends_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
                             /usr/bin/dialog --msgbox "Backends Outgoing IP format incorrect" 8 60
-                        elif  !(echo "$logom_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                        elif  ! (echo "$logom_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
                             /usr/bin/dialog --msgbox "LogOM Outgoing IP format incorrect" 8 60
                         else
                             /usr/local/bin/sudo /home/vlt-adm/system/netconfig-resolv.sh
-			    /usr/local/bin/sudo /home/vlt-adm/system/network-ips.sh "${management_ip}" "${internet_ip}" "${backends_outgoing_ip}" "${logom_outgoing_ip}"
+                            /usr/local/bin/sudo /home/vlt-adm/system/network-ips.sh "${management_ip}" "${internet_ip}" "${backends_outgoing_ip}" "${logom_outgoing_ip}"
                         fi
                     fi
                     ;;
@@ -134,13 +134,13 @@ do
                 "proxy")
                     /bin/rm -f "$tmp_file"
                     if [ -f /etc/rc.conf.proxy ]; then
-                        proxy="$(/bin/cat /etc/rc.conf.proxy | /usr/bin/grep "http_" | /usr/bin/sed 's/.*http:\/\///')"
+                        proxy="$(/usr/bin/grep "http_" /etc/rc.conf.proxy | /usr/bin/sed 's/.*http:\/\///')"
                     fi
                     if /usr/bin/dialog --title "Vulture HTTP Proxy setting" --inputbox "Enter HTTP proxy address (IPv4:port or [IPv6]:port)" 8 60 "${proxy}" --stdout > "$tmp_file"; then
                         proxy="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
 
-                        if  echo "$proxy" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}:[[:digit:]]{1,5}$)|(^\[([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}\]:[[:digit:]]{1,5}$)' || [ "$proxy" == "" ] ; then
+                        if echo "$proxy" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}:[[:digit:]]{1,5}$)|(^\[([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}\]:[[:digit:]]{1,5}$)' || [ -z "$proxy" ] ; then
                             /usr/local/bin/sudo /home/vlt-adm/system/proxy.sh "${proxy}"
                         else
                             /usr/bin/dialog --msgbox "IP format incorrect" 8 60
