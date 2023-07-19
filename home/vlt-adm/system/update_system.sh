@@ -108,6 +108,8 @@ initialize() {
         exit 1
     fi
 
+    echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Beginning upgrade"
+
     trap finalize SIGINT
 
     if [ -f /etc/rc.conf.proxy ]; then
@@ -208,7 +210,7 @@ finalize() {
         echo "[-] Cron restarted"
     fi
 
-    echo "Upgrade finished!"
+    echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Upgrade finished!"
     exit $err_code
 }
 
