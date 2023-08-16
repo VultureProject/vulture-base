@@ -112,6 +112,8 @@ initialize() {
 
     trap finalize SIGINT
 
+    /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance 2>/dev/null || true
+
     if [ -f /etc/rc.conf.proxy ]; then
         . /etc/rc.conf.proxy
         export http_proxy=${http_proxy}
@@ -209,6 +211,8 @@ finalize() {
         /usr/sbin/service cron start
         echo "[-] Cron restarted"
     fi
+
+    /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance 2>/dev/null || true
 
     echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Upgrade finished!"
     exit $err_code
