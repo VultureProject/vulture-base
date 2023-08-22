@@ -5,10 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [2.1.6] - 2023-08-22
 ### Added
 - [UPDATE_SYSTEM] Updating toggle maintenance
 - [RSYSLOG_TEMPLATES] bulkid-template for ELS datastream support
+### Fixed
+- [UPGRADE_TO_13] Motd template
 
 
 ## [2.1.5] - 2023-07-20
