@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [RSYSLOG_TEMPLATES] bulkid-template for ELS datastream support
 ### Fixed
 - [UPGRADE_TO_13] Motd template
+- [UPDATE_SYSTEM] Force maintenance state during update
 
 
 ## [2.1.5] - 2023-07-20
