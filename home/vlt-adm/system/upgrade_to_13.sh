@@ -106,9 +106,7 @@ restart_and_continue(){
 
 clean_and_restart() {
     /bin/echo "[+] Cleaning up..."
-    if [ -e /etc/cron.d/vulture_update ]; then
-        /bin/rm -f /etc/cron.d/vulture_update
-    fi
+    /bin/echo "@reboot root sleep 30 && /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance --off && rm /etc/cron.d/vulture_update" > "/etc/cron.d/vulture_update"
 
     /bin/echo "[+] Cleaning temporary dir..."
     /bin/rm -rf $temp_dir
@@ -310,6 +308,8 @@ if [ ! -e ${temp_dir}/upgrading ] ; then
         check_preconditions
 
         /bin/echo "Upgrade started!"
+
+        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance --on 2>/dev/null || true
 
         # Updating repositories for host
         ${FOLDER}/register_vulture_repos.sh
