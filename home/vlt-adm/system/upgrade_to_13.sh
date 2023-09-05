@@ -89,7 +89,7 @@ restart_and_continue(){
     # enable script to be run on startup
     tmp_be_mount="$(/usr/bin/mktemp -d)"
     /sbin/bectl mount "$new_be" "$tmp_be_mount" || finalize 1 "Could not mount Boot Environment"
-    /bin/echo "@reboot root sleep 30 && /bin/sh $SCRIPT" > "${tmp_be_mount}/etc/cron.d/vulture_update" || finalize 1  "[/] Failed to setup startup script"
+    /bin/echo "@reboot root sleep 60 && /bin/sh $SCRIPT" > "${tmp_be_mount}/etc/cron.d/vulture_update" || finalize 1  "[/] Failed to setup startup script"
     # Add a temporary message to end of MOTD to warn about the ongoing upgrade
     /usr/bin/sed -i '' '$s/.*/[5m[38;5;196mUpgrade in progress, your machine will reboot shortly, please wait patiently![0m/' "${tmp_be_mount}/etc/motd.template"
     /usr/bin/sed -i '' 's+welcome=/etc/motd+welcome=/var/run/motd+' "${tmp_be_mount}/etc/login.conf"
@@ -106,7 +106,7 @@ restart_and_continue(){
 
 clean_and_restart() {
     /bin/echo "[+] Cleaning up..."
-    /bin/echo "@reboot root sleep 30 && /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance --off && rm /etc/cron.d/vulture_update" > "/etc/cron.d/vulture_update"
+    /bin/echo "@reboot root sleep 60 && /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance --off && rm /etc/cron.d/vulture_update" > "/etc/cron.d/vulture_update"
 
     /bin/echo "[+] Cleaning temporary dir..."
     /bin/rm -rf $temp_dir
