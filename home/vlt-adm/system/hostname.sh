@@ -26,9 +26,9 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
     grep 'hostname=""' /tmp/bsdinstall_etc/rc.conf.hostname 1>&2
     if [ $? -ne 0 ]; then #if == 0 hostname="" so we don't update
         /bin/cat /tmp/bsdinstall_etc/rc.conf.hostname | tr -d '"' > /etc/rc.conf.hostname
-        sysrc -f /etc/rc.conf $(cat /etc/rc.conf.hostname)
+        sysrc -f /etc/rc.conf "$(cat /etc/rc.conf.hostname)"
         . /etc/rc.conf
-        /bin/hostname ${hostname}
+        /bin/hostname "${hostname}"
 
         # Retrieve management IP address
         ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n management_ip 2> /dev/null)"

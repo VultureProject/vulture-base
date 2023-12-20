@@ -53,7 +53,7 @@ update_packages(){
 
     /bin/echo "[+] Upgrading host system packages"
     /usr/sbin/pkg unlock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
-    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy
+    IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy || finalize 1 "Failed to upgrade packages"
     /usr/sbin/pkg lock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
     /bin/echo "[-] Done"
 
@@ -64,7 +64,7 @@ update_packages(){
 
     /bin/echo "[+] Upgrading jail's packages"
     for jail in "haproxy" "rsyslog" "redis" "mongodb" "portal" "apache" ; do
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j $jail upgrade -fy
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg -j $jail upgrade -fy || finalize 1 "Failed to upgrade packages on jail $jail"
     done
     /bin/echo "[-] Done"
 

@@ -37,7 +37,8 @@ if [ "$password" = "$confirm_password" ]; then
     export ftp_proxy=""
 
     # Do a first curl to create log files
-    echo "[+] Try to contact GUI ..."
+    echo "[+] Trying to contact GUI..."
+    /bin/sleep 5
     curl -XGET -kw "Status  code : %{http_code}\n"  -o /dev/null https://$(hostname):8000/ 2> /dev/null
 
     /usr/sbin/jexec redis service redis restart

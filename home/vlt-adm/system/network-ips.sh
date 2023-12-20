@@ -11,8 +11,7 @@ internet_ip="${2:-$management_ip}"
 backends_outgoing_ip="${3:-$management_ip}"
 logom_outgoing_ip="${4:-$management_ip}"
 
-/sbin/ifconfig | grep "$management_ip" > /dev/null
-if [ "$?" == 0 ]; then
+if /sbin/ifconfig | grep -q "$management_ip"; then
     # update node network ips in /etc/rc.conf.d/network
     /usr/sbin/sysrc -f /etc/rc.conf.d/network management_ip=$management_ip internet_ip=$internet_ip backends_outgoing_ip=$backends_outgoing_ip logom_outgoing_ip=$logom_outgoing_ip
 
@@ -20,7 +19,7 @@ if [ "$?" == 0 ]; then
     /home/vlt-adm/system/write_hostname.sh
 
     #Update sentinel and redis with the new Management IP address
-    if [ "$(/usr/sbin/jls | /usr/bin/grep "redis")" == "" ]; then
+    if ! /usr/sbin/jls | /usr/bin/grep -q "redis"; then
         /usr/sbin/jail -cm redis > /dev/null
     fi
     /usr/sbin/jexec redis /usr/sbin/service redis stop > /dev/null
