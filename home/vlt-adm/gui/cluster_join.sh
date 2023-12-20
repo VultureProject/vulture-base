@@ -35,8 +35,12 @@ if echo "$master_ip" | grep ":" ; then
     master_ip="[${master_ip}]"
 fi
 
-/zroot/apache/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key"
-
+if [ -d /zroot/apache/home ]; then
+    /zroot/apache/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key"
+fi
+if [ -d /zroot/apache/root/home ]; then
+    /zroot/apache/root/home/vlt-os/bootstrap/cluster_join "$master_hostname" "$master_ip" "$api_key"
+fi
 /usr/sbin/service vultured start
 /usr/sbin/jexec apache service gunicorn start
 /usr/sbin/jexec portal service gunicorn start

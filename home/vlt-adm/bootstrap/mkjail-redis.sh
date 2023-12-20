@@ -118,8 +118,8 @@ chmod 750 ${TARGET}/var/db/vulture-redis/
 chown redis:redis ${TARGET}/var/run/redis/
 chmod 750 ${TARGET}/var/run/redis/
 
-/bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/redis.conf
-/bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/sentinel.conf
+/bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/\${management_ip}/${management_ip}/" > /usr/local/etc/redis/redis.conf
+/bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/\${management_ip}/${management_ip}/" > /usr/local/etc/redis/sentinel.conf
 /usr/sbin/chown -R redis:vlt-conf /usr/local/etc/redis/
 
 /usr/bin/touch ${TARGET}/var/log/redis.log
