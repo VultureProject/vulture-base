@@ -138,6 +138,14 @@ initialize() {
         done
     fi
 
+    # Disable harden_rtld: currently breaks many packages upgrade
+    _was_rtld=$(/sbin/sysctl -n hardening.harden_rtld)
+    /sbin/sysctl hardening.harden_rtld=0
+    for jail in "haproxy" "mongodb" "redis" "apache" "portal" "rsyslog"; do
+        eval "_was_rtld_${jail}=$(/usr/sbin/jexec $jail /sbin/sysctl -n hardening.harden_rtld)"
+        /usr/sbin/jexec $jail /sbin/sysctl hardening.harden_rtld=0 > /dev/null
+    done
+
     # Unlock Vulture packages
     echo "[+] Unlocking Vulture packages..."
     /usr/sbin/pkg unlock -y vulture-base vulture-gui vulture-haproxy vulture-mongodb vulture-redis vulture-rsyslog
@@ -196,6 +204,12 @@ finalize() {
             echo "[-] Done."
         done
     fi
+
+    # Reset hardeen_rtld to its previous value
+    /sbin/sysctl hardening.harden_rtld="${_was_rtld}"
+    for jail in "haproxy" "mongodb" "redis" "apache" "portal" "rsyslog"; do
+        eval "/usr/sbin/jexec $jail /sbin/sysctl hardening.harden_rtld=\$_was_rtld_$jail" > /dev/null
+    done
 
     # Lock Vulture packages
     echo "[+] Lock Vulture packages..."
