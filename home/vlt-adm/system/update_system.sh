@@ -349,21 +349,6 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
     fi
 done
 
-# If no argument, or Darwin
-if [ -z "$1" -o "$1" == "darwin" ] ; then
-    if [ $do_update_packages -gt 0 ]; then
-        /usr/sbin/service darwin stop
-        echo "[+] Updating darwin..."
-        if [ "$(/usr/sbin/pkg query "%v" darwin)" == "1.2.1-2" ]; then
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -fy darwin || finalize 1 "Failed to upgrade package Darwin"
-        else
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y darwin || finalize 1 "Failed to upgrade package Darwin"
-        fi
-        echo "[-] Darwin updated, starting service"
-        /usr/sbin/service darwin start
-    fi
-fi
-
 # No parameter, or gui
 if [ -z "$1" -o "$1" == "gui" ] ; then
     echo "[+] Updating GUI..."
