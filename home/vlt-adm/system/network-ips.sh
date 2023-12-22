@@ -25,8 +25,24 @@ if /sbin/ifconfig | grep -q "$management_ip"; then
     /usr/sbin/jexec redis /usr/sbin/service redis stop > /dev/null
     /usr/sbin/jexec redis /usr/sbin/service sentinel stop > /dev/null
 
-    /bin/cat /usr/local/etc/redis/templates/redis.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/redis.conf
-    /bin/cat /usr/local/etc/redis/templates/sentinel.tpl | /usr/bin/sed "s/{{ management_ip }}/${management_ip}/" > /usr/local/etc/redis/sentinel.conf
+    if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
+        redis_password="$(/usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster; print(Cluster.get_global_config().redis_password)')"
+        # Redis
+        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG SET replica-announce-ip ${ip}
+        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG SET masterauth ${redis_password}
+        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG SET requirepass ${redis_password}
+        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG REWRITE
+        # Sentinel
+        jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip ${ip}
+        jexec redis redis-cli -p 26379 SENTINEL CONFIG SET auth-pass ${redis_password}
+        # Reload HAProxy config
+        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Cluster; Cluster.api_request('services.haproxy.haproxy.configure_node')"
+    else
+        # Redis
+        jexec redis redis-cli CONFIG SET replica-announce-ip ${ip}
+        # Sentinel
+        jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip ${ip}
+    fi
 
     /usr/sbin/jexec redis /usr/sbin/service redis start > /dev/null
     /usr/sbin/jexec redis /usr/sbin/service sentinel start > /dev/null
