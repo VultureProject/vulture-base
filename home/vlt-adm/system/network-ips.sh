@@ -22,30 +22,6 @@ if /sbin/ifconfig | grep -q "$management_ip"; then
     if ! /usr/sbin/jls | /usr/bin/grep -q "redis"; then
         /usr/sbin/jail -cm redis > /dev/null
     fi
-    /usr/sbin/jexec redis /usr/sbin/service redis stop > /dev/null
-    /usr/sbin/jexec redis /usr/sbin/service sentinel stop > /dev/null
-
-    if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
-        redis_password="$(/usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster; print(Cluster.get_global_config().redis_password)')"
-        # Redis
-        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG SET replica-announce-ip ${ip}
-        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG SET masterauth ${redis_password}
-        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG SET requirepass ${redis_password}
-        REDISCLI_AUTH=${redis_password} jexec redis redis-cli CONFIG REWRITE
-        # Sentinel
-        jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip ${ip}
-        jexec redis redis-cli -p 26379 SENTINEL CONFIG SET auth-pass ${redis_password}
-        # Reload HAProxy config
-        /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Cluster; Cluster.api_request('services.haproxy.haproxy.configure_node')"
-    else
-        # Redis
-        jexec redis redis-cli CONFIG SET replica-announce-ip ${ip}
-        # Sentinel
-        jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip ${ip}
-    fi
-
-    /usr/sbin/jexec redis /usr/sbin/service redis start > /dev/null
-    /usr/sbin/jexec redis /usr/sbin/service sentinel start > /dev/null
 
     #Update Rsyslog jail conf
     case $management_ip in
@@ -60,15 +36,27 @@ if /sbin/ifconfig | grep -q "$management_ip"; then
 
     # If boostrap has already be done,
     if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
-        # update node network ips in Mongo
+        # Update node network ips in Mongo
         /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c "from system.cluster.models import Node ; n = Node.objects.get(name=\"`hostname`\") ; n.management_ip = \"$management_ip\" ; n.internet_ip = \"$internet_ip\" ; n.backends_outgoing_ip = \"$backends_outgoing_ip\" ; n.logom_outgoing_ip = \"$logom_outgoing_ip\" ; n.save()"
-        # reload apache service
+
+        # Update Redis configuration
+        redis_password="$(/usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster; print(Cluster.get_global_config().redis_password)')"
+        REDISCLI_AUTH="${redis_password}" /usr/sbin/jexec redis redis-cli CONFIG SET replica-announce-ip "${management_ip}"
+        REDISCLI_AUTH="${redis_password}" /usr/sbin/jexec redis redis-cli CONFIG REWRITE
+        echo "configuring sentinel..."
+        /usr/sbin/jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip "${management_ip}"
+
+        # Reload apache service
         /usr/sbin/jexec apache /usr/sbin/service gunicorn reload
         /usr/sbin/jexec apache /usr/sbin/service nginx reload
-        # reload pf configuration
+        # Reload pf configuration
         /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py shell -c 'from system.cluster.models import Cluster ; Cluster.api_request("services.pf.pf.gen_config")'
 
     else
+        # Update Redis/Sentinel configuration (without password)
+        /usr/sbin/jexec redis redis-cli CONFIG SET replica-announce-ip "${management_ip}"
+        /usr/sbin/jexec redis redis-cli CONFIG REWRITE
+        /usr/sbin/jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip "${management_ip}"
         /usr/local/bin/pfctl-init.sh
         /sbin/pfctl -f /usr/local/etc/pf.conf
     fi
