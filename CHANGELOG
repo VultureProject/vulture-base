@@ -15,10 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.8] - 2024-01-10
 ### Removed
 - [UPDATE_SYSTEM] Don't upgrade/restart Darwin service specifically
-### Fixed
-- [UPDATE_SYSTEM] Avoid linker errors during pkg upgrades by deactivating harden_rtld during upgrade
 ### Changed
 - [MISC] Some code cleanups and minor fixes
+### Fixed
+- [UPDATE_SYSTEM] Avoid linker errors during pkg upgrades by deactivating harden_rtld during upgrade
+- [CLUSTER_JOIN] Fix wrong ca.key after cluster_join
 
 
 ## [2.1.7] - 2023-09-12

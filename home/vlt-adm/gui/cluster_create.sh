@@ -44,7 +44,7 @@ if [ "$password" = "$confirm_password" ]; then
     /usr/sbin/jexec redis service redis restart
     /home/jails.apache/.zfs-source/home/vlt-os/bootstrap/cluster_create $username $password || exit 2
 
-    # Restart apache service to refresh code and conf
+    # Restart gunicorn service to refresh code and conf
     /usr/sbin/jexec apache /usr/sbin/service gunicorn restart
 
     /usr/sbin/service vultured restart || /usr/sbin/service vultured start
