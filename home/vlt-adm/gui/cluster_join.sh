@@ -40,5 +40,3 @@ fi
 /usr/sbin/service vultured start
 /usr/sbin/jexec apache service gunicorn start
 /usr/sbin/jexec portal service gunicorn start
-# CA cert is collected during cluster_join but not the key
-cat /var/db/pki/Vulture_PKI_*.key > /var/db/pki/ca.key

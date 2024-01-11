@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [JAILS] remove now-useless mkjail-* scripts
 ### Changed
 - [SCRIPTS] Update Redis/Sentinel's announce-ip through redis commands when changing Vulture management IP
+### Fixed
+- [CLUSTER_JOIN] Fix wrong ca.key after cluster_join
 
 
 ## [2.1.8] - 2024-01-10
@@ -19,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [MISC] Some code cleanups and minor fixes
 ### Fixed
 - [UPDATE_SYSTEM] Avoid linker errors during pkg upgrades by deactivating harden_rtld during upgrade
-- [CLUSTER_JOIN] Fix wrong ca.key after cluster_join
 
 
 ## [2.1.7] - 2023-09-12
