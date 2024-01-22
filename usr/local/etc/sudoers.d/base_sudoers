@@ -18,12 +18,6 @@ vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/keymap.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/geli-passphrase.sh
 vlt-adm ALL=NOPASSWD:/bin/mv /tmp/bsdinstall_etc/rc.conf.keymap /etc/
 
-vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-haproxy.sh
-vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-mongodb.sh
-vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-redis.sh
-vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-rsyslog.sh
-vlt-adm ALL=NOPASSWD:/home/vlt-adm/bootstrap/mkjail-apache.sh
-
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail start
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail stop
 vlt-adm ALL=NOPASSWD:/usr/sbin/service jail restart

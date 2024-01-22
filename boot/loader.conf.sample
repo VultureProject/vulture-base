@@ -12,7 +12,7 @@ nvme_load="YES"
 if_ena_load="YES"
 
 net.fibs=2
-net.add_addr_allfibs=1
+#net.add_addr_allfibs=1 # has to be moved to /etc/sysctl.conf
 
 #This is to avoid kernel panic on HP Proliant server at boot
 vm.boot_pages=120
