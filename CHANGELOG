@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [BASE_SUDOERS] mentions of mkjail-*
 ### Changed
 - [SCRIPTS] Update Redis/Sentinel's announce-ip through redis commands when changing Vulture management IP
+- [SYSTEM] [CSHRC] Add usefull keyboard bindings
 ### Fixed
 - [CLUSTER_JOIN] Fix wrong ca.key after cluster_join
 
