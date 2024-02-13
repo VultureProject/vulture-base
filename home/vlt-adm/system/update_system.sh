@@ -13,6 +13,7 @@ download_only=0
 use_dnssec=0
 clean_cache=0
 cron_was_up=0
+vultured_was_up=0
 
 #############
 # functions #
@@ -113,6 +114,11 @@ initialize() {
     trap finalize SIGINT
 
     /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance --on 2>/dev/null || true
+
+    if /usr/sbin/service vultured status > /dev/null; then
+        vultured_was_up=1
+        /usr/sbin/service vultured stop
+    fi
 
     if [ -f /etc/rc.conf.proxy ]; then
         . /etc/rc.conf.proxy
@@ -227,6 +233,11 @@ finalize() {
     fi
 
     /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py toggle_maintenance --off 2>/dev/null || true
+
+    if [ $vultured_was_up -eq 1 ]; then
+        # Restart Vultured after upgrade
+        /usr/sbin/service vultured start
+    fi
 
     echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Upgrade finished!"
     exit $err_code
@@ -423,11 +434,6 @@ if [ -z "$1" ] ; then
         IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y  || finalize 1 "Error while upgrading packages"
         echo "[-] All packages updated"
     fi
-fi
-
-# Do not start vultured if the node is not installed
-if /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py is_node_bootstrapped >/dev/null 2>&1 ; then
-    /usr/sbin/service vultured restart
 fi
 
 if [ $clean_cache -gt 0 ]; then
