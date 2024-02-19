@@ -54,11 +54,11 @@ if /sbin/ifconfig | grep -q "$management_ip"; then
 
     else
         # Update Redis/Sentinel configuration (without password)
+        /usr/local/bin/pfctl-init.sh
+        /sbin/pfctl -f /usr/local/etc/pf.conf
         /usr/sbin/jexec redis redis-cli CONFIG SET replica-announce-ip "${management_ip}"
         /usr/sbin/jexec redis redis-cli CONFIG REWRITE
         /usr/sbin/jexec redis redis-cli -p 26379 SENTINEL CONFIG SET announce-ip "${management_ip}"
-        /usr/local/bin/pfctl-init.sh
-        /sbin/pfctl -f /usr/local/etc/pf.conf
     fi
 else
     /bin/echo "Invalid IP Address !"

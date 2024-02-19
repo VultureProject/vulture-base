@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [UPDATE_SYSTEM] Stop vultured service during upgrades
 ### Fixed
 - [CLUSTER_JOIN] Fix wrong ca.key after cluster_join
+- [NETWORK_IPS] Init pf rules before redis access
 
 
 ## [2.1.8] - 2024-01-10
