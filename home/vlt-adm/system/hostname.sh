@@ -83,6 +83,8 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
             else
                 /bin/echo "Failed to initialize mongodb node, migrations aborted." >> /dev/stderr
             fi
+            /usr/sbin/jexec apache /usr/sbin/service gunicorn restart
+            /usr/sbin/jexec portal /usr/sbin/service gunicorn restart
         elif [ -n "$old_hostname" -a "$old_hostname" != "$hostname" ] ; then # old != new
             echo "Rename replicaset"
             # Change the hostname of the node in MongoDB replicaset configuration
