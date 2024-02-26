@@ -11,13 +11,6 @@ alias j		jobs -l
 alias la	ls -aF
 alias lf	ls -FA
 alias ll	ls -laFGh
-alias cp	cp -v
-alias mv	mv -v
-alias rm	rm -v
-alias chmod	chmod -v
-alias chown	chown -v
-alias mkdir	mkdir -vp
-alias grep	grep --color=auto
 alias admin	/home/vlt-adm/admin.sh
 
 # read(2) of directories may not be desirable by default, as this will provoke
