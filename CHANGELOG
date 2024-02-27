@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [SCRIPTS] Update Redis/Sentinel's announce-ip through redis commands when changing Vulture management IP
 - [SYSTEM] [CSHRC] Add usefull keyboard bindings
 - [UPDATE_SYSTEM] Stop vultured service during upgrades
+- [UPDATE_SYSTEM] Install kernel/base in a separate Boot Environment
 ### Fixed
 - [CLUSTER_JOIN] Fix wrong ca.key after cluster_join
 - [NETWORK_IPS] Init pf rules before redis access
