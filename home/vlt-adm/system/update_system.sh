@@ -71,11 +71,21 @@ download_system_update() {
 
 has_pending_be() {
     if /sbin/bectl list -H | cut -f 2 | grep -qE "(RN|NR)"; then
-        return 1
+        return 0
     else
         sed -i '' '/Upgrade:/d' /var/run/motd
-        /usr/bin/printf "${COLOR_RED}${TEXT_BLINK}Upgrade: the system has a pending kernel/userland upgrade, please restart your machine to apply${COLOR_RESET}\n" | tee -a /var/run/motd
+        /usr/bin/printf "${COLOR_RED}${TEXT_BLINK}Upgrade: the system has a pending new Boot Environment, please restart your machine to apply!${COLOR_RESET}\n" | tee -a /var/run/motd
+        return 1
+    fi
+}
+
+has_upgraded_kernel() {
+    if [ "$(uname -U)" -eq "$(uname -K)" ]; then
         return 0
+    else
+        sed -i '' '/Upgrade:/d' /var/run/motd
+        /usr/bin/printf "${COLOR_RED}${TEXT_BLINK}Upgrade: the system has a pending kernel/userland upgrade, please restart your machine to apply!${COLOR_RESET}\n" | tee -a /var/run/motd
+        return 1
     fi
 }
 
@@ -93,15 +103,6 @@ update_system() {
                 # use -j flag from hbsd-update to let it handle upgrade of "full" jail
                 options="-j $jail"
             fi
-        else
-            # If the current Boot Environment (BE) is not Active now AND on the next boot (N + R)
-            # then the machine needs to be restarted before trying to upgrade the kernel+base again
-            if has_pending_be; then
-                /usr/bin/printf "${COLOR_RED}Detected a pending boot environment, won't upgrade your kernel! You need to restart the machine first!${COLOR_RESET}\n" 1>&2
-                return 0;
-            fi
-            new_be="Vulture-auto-$(uname -K)-$(date +%Y%m%d%H%M%S)"
-            options="${options} -b $new_be"
         fi
         if [ -n "$system_version" ]; then
             # Add -U as non-last update versions cannot be verified
@@ -131,6 +132,9 @@ initialize() {
         /bin/echo "This script must be run as root" 1>&2
         exit 1
     fi
+
+    has_pending_be || exit 1
+    has_upgraded_kernel || exit 1
 
     echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Beginning upgrade"
 
@@ -263,6 +267,7 @@ finalize() {
     fi
 
     has_pending_be
+    has_upgraded_kernel
 
     echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Upgrade finished!"
     exit $err_code
