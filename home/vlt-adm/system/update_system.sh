@@ -341,7 +341,7 @@ if [ $do_update_system -gt 0 ]; then
         echo "Forcing upgrade of secadm packages (kernel version mismatch)"
         /usr/sbin/pkg upgrade -yf secadm secadm-kmod
         for jail in "haproxy" "apache" "portal" "mongodb" "redis" "rsyslog" ; do
-            /usr/sbin/pkg -j "$jail" upgrade -yf secadm secadm-kmod
+            /usr/sbin/pkg -j "$jail" upgrade -yf secadm
         done
     fi
     /bin/echo "[-] Done."

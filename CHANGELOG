@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Fixed
+- [UPDATE_SYSTEM] Don't upgrade secadm-kmod in jails
 
 
 ## [2.1.9]- 2024-03-04
