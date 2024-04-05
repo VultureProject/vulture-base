@@ -47,10 +47,10 @@ download_system_update() {
         if [ -n "$jail" ] ; then
             if [ -d /.jail_system ]; then
                 # upgrade base jail_system root with local hbsd-update.conf (for "thin" jails)
-                options="${options} -r /.jail_system/"
+                options="${options} -nr /.jail_system/"
             else
                 # use -j flag from hbsd-update to let it handle upgrade of "full" jail
-                options="${options} -j $jail"
+                options="${options} -nj $jail"
             fi
         fi
         if [ -n "$system_version" ]; then
