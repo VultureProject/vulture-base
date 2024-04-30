@@ -1,8 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
-COLOR_RESET='\033[0m'
-COLOR_RED='\033[0;31m'
-TEXT_BLINK='\033[5m'
+TIME_START="$(date +%Y-%m-%dT%H:%M:%S)"
 
 #############
 # variables #
@@ -18,10 +16,19 @@ use_dnssec=0
 clean_cache=0
 cron_was_up=0
 vultured_was_up=0
+install_to_BE=0
+create_snapshot=0
+new_BE_name="AUTO_BE_${TIME_START}"
+
+### Internal ###
+_pkg_options=""
 
 #############
 # functions #
 #############
+. /usr/home/vlt-adm/system/common.sh
+. /usr/home/vlt-adm/system/snapshot.sh
+
 usage() {
     echo "USAGE ${0} OPTIONS"
     echo "OPTIONS:"
@@ -30,10 +37,12 @@ usage() {
     echo "	-V	set a custom system update package (as specified by 'hbsd-update -v', only available on HBSD)"
     echo "	-c	clean pkg cache and tempdir at the end of the script (incompatible with -T and -D)"
     echo "	-d	use dnssec while downloading HardenedBSD updates (disabled by default)"
-    echo "	-u	do not update system/kernel, only update packages"
-    echo "	-s	do not update packages, only update system/kernel"
-    echo "	-t tmpdir	temporary directory to use (default is /tmp/vulture_update/, only available on HBSD)"
-    echo "	-r strategy	(non-interactive) resolve strategy to pass to hbsd-update script while upgrading system configuration files (see man etcupdate for more info, default is 'mf')"
+    echo "	-u	only update packages"
+    echo "	-s	only update system/kernel"
+    echo "  -b	Use a Boot Environment to install updates"
+    echo "  -B	Snapshot system and jails before doing the upgrade"
+    echo "	-t <tmpdir>	temporary directory to use (default is /tmp/vulture_update/, only available on HBSD)"
+    echo "	-r <strategy>	(non-interactive) resolve strategy to pass to hbsd-update script while upgrading system configuration files (see man etcupdate for more info, default is 'mf')"
     exit 1
 }
 
@@ -74,7 +83,7 @@ has_pending_be() {
         return 0
     else
         sed -i '' '/Upgrade:/d' /var/run/motd
-        /usr/bin/printf "${COLOR_RED}${TEXT_BLINK}Upgrade: the system has a pending new Boot Environment, please restart your machine to apply!${COLOR_RESET}\n" | tee -a /var/run/motd
+        error_and_blink "Upgrade: the system has a pending new Boot Environment, please restart your machine to apply!" | tee -a /var/run/motd
         return 1
     fi
 }
@@ -84,7 +93,7 @@ has_upgraded_kernel() {
         return 0
     else
         sed -i '' '/Upgrade:/d' /var/run/motd
-        /usr/bin/printf "${COLOR_RED}${TEXT_BLINK}Upgrade: the system has a pending kernel/userland upgrade, please restart your machine to apply!${COLOR_RESET}\n" | tee -a /var/run/motd
+        error_and_blink "Upgrade: the system has a pending kernel/userland upgrade, please restart your machine to apply!" | tee -a /var/run/motd
         return 1
     fi
 }
@@ -109,6 +118,9 @@ update_system() {
             echo "[!] Custom version of system update selected, this version will be installed without signature verification!"
             options="${options} -v $system_version -U"
         fi
+        if [ -z "$jail" ] && [ $install_to_BE -gt 0 ]; then
+            options="${options} -b $new_BE_name"
+        fi
         # Store (-t) and keep (-T) downloads to $download_dir for later use
         # Previous download should be present in the 'download_dir' folder already
         if [ -n "$resolve_strategy" ] ; then
@@ -118,6 +130,17 @@ update_system() {
             /usr/sbin/hbsd-update -d -t "$download_dir" -T -D $options
         fi
         if [ $? -ne 0 ] ; then return 1 ; fi
+        if [ -z "$jail" ]; then
+            if /sbin/bectl list -H | grep -q "${new_BE_name}"; then
+                echo "[!] New BE has been created! Updates will be installed in it!"
+                _pkg_options="-r ${temp_dir}/new_be"
+                /sbin/bectl mount "$new_BE_name" "${temp_dir}/new_be"
+                if [ $? -ne 0 ] ; then return 1 ; fi
+            else
+                echo "[*] No new BE created"
+                new_BE_name=""
+            fi
+        fi
     else
         # If jail, just install do not fetch
         if [ -n "$jail" ] ; then options="-b /zroot/$jail" ; fi
@@ -136,7 +159,7 @@ initialize() {
     has_pending_be || exit 1
     has_upgraded_kernel || exit 1
 
-    echo "[$(date +%Y-%m-%dT%H:%M:%S+00:00)] Beginning upgrade"
+    echo "[${TIME_START}+00:00] Beginning upgrade"
 
     trap finalize SIGINT
 
@@ -195,7 +218,7 @@ initialize() {
             # send a SIGTERM to close scripts cleanly, if pwait expires after 10m, force kill all remaining scripts
             /bin/pkill -15 -f "${process_match}"
             if ! /bin/pgrep -f "${process_match}" | /usr/bin/xargs /bin/pwait -t10m; then
-                echo -e "\033[0;31m[!] Some crons still running after 10 minutes, forcing remaining crons to stop!\033[0m"
+                error "[!] Some crons still running after 10 minutes, forcing remaining crons to stop!"
                 /bin/pgrep -lf "${process_match}"
                 /bin/pkill -9 -lf "${process_match}"
             fi
@@ -215,8 +238,12 @@ finalize() {
 
     if [ -n "$err_message" ]; then
         echo ""
-        echo "[!] ${err_message}"
+        error "[!] ${err_message}"
         echo ""
+    fi
+
+    if [ $install_to_BE -gt 0 ] && [ -n "${new_BE_name}" ]; then
+        /sbin/bectl umount "${new_BE_name}" || warn "Could not unmount the new BE"
     fi
 
     if [ $keep_temp_dir -eq 0 ]; then
@@ -228,12 +255,12 @@ finalize() {
     # Re-enable secadm rules if on an HardenedBSD system
     if [ -f /usr/sbin/hbsd-update ] ; then
         echo "[+] Enabling root secadm rules"
-        /usr/sbin/service secadm start || echo "Could not enable secadm rules"
+        /usr/sbin/service secadm start || warn "Could not enable secadm rules"
         echo "[-] Done."
 
         for jail in "mongodb" "apache" "portal"; do
             echo "[+] [${jail}] Enabling secadm rules"
-            /usr/sbin/jexec $jail /usr/sbin/service secadm start || echo "Could not enable secadm rules"
+            /usr/sbin/jexec $jail /usr/sbin/service secadm start || warn "Could not enable secadm rules"
             echo "[-] Done."
         done
     fi
@@ -277,7 +304,7 @@ finalize() {
 ####################
 # parse parameters #
 ####################
-while getopts 'hDTV:cdust:r:' opt; do
+while getopts 'hDTV:cdusbBt:r:' opt; do
     case "${opt}" in
         D)  download_only=1;
             keep_temp_dir=1;
@@ -294,6 +321,10 @@ while getopts 'hDTV:cdust:r:' opt; do
             ;;
         s)  do_update_packages=0;
             ;;
+        b)  install_to_BE=1;
+            ;;
+        B)  create_snapshot=1;
+            ;;
         t)  temp_dir="${OPTARG}";
             ;;
         r)  resolve_strategy="${OPTARG}";
@@ -304,12 +335,33 @@ while getopts 'hDTV:cdust:r:' opt; do
 done
 shift $((OPTIND-1))
 
+echo "[DEBUG] temp_dir: ${temp_dir}"
+echo "[DEBUG] resolve_strategy: ${resolve_strategy}"
+echo "[DEBUG] system_version: ${system_version}"
+echo "[DEBUG] keep_temp_dir: ${keep_temp_dir}"
+echo "[DEBUG] do_update_system: ${do_update_system}"
+echo "[DEBUG] do_update_packages: ${do_update_packages}"
+echo "[DEBUG] download_only: ${download_only}"
+echo "[DEBUG] use_dnssec: ${use_dnssec}"
+echo "[DEBUG] clean_cache: ${clean_cache}"
+echo "[DEBUG] cron_was_up: ${cron_was_up}"
+echo "[DEBUG] vultured_was_up: ${vultured_was_up}"
+echo "[DEBUG] install_to_BE: ${install_to_BE}"
+echo "[DEBUG] new_BE_name: ${new_BE_name}"
+echo "[DEBUG] _pkg_options: ${_pkg_options}"
+# exit 0
+
 if [ $clean_cache -gt 0 -a $keep_temp_dir -gt 0 -o $clean_cache -gt 0 -a $download_only -gt 0 ]; then
     echo "[!] Cannot activate -c if -D or -T are set"
     exit 1
 fi
 
 initialize
+
+if [ $create_snapshot -gt 0 ]; then
+    snapshot_system || finalize 1 "Could not snapshot system!"
+    snapshot_jails || finalize 1 "Could not snapshot jails!"
+fi
 
 if [ $do_update_packages -gt 0 ]; then
     IGNORE_OSVERSION="yes" /usr/sbin/pkg update -f || finalize 1 "Could not update list of packages"
@@ -336,10 +388,10 @@ if [ $do_update_system -gt 0 ]; then
     /bin/echo "[+] Updating system..."
     download_system_update ${temp_dir} || finalize 1 "Failed to download system upgrades"
     update_system ${temp_dir} || finalize 1 "Failed to install system upgrades"
-    secadm_version="$(/usr/sbin/pkg query '%At:%Av' secadm | /usr/bin/grep "FreeBSD_version" | /usr/bin/cut -d : -f 2)"
+    secadm_version="$(/usr/sbin/pkg ${_pkg_options} query '%At:%Av' secadm | /usr/bin/grep "FreeBSD_version" | /usr/bin/cut -d : -f 2)"
     if [ -n "$secadm_version" ] && [ "$secadm_version" -lt "$(uname -U)" ]; then
         echo "Forcing upgrade of secadm packages (kernel version mismatch)"
-        /usr/sbin/pkg upgrade -yf secadm secadm-kmod
+        /usr/sbin/pkg ${_pkg_options} upgrade -yf secadm secadm-kmod
         for jail in "haproxy" "apache" "portal" "mongodb" "redis" "rsyslog" ; do
             /usr/sbin/pkg -j "$jail" upgrade -yf secadm secadm-kmod
         done
@@ -364,7 +416,7 @@ for jail in "haproxy" "redis" "mongodb" "rsyslog" ; do
             IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" update -f || finalize 1 "Could not update list of packages for jail ${jail}"
             IGNORE_OSVERSION="yes" /usr/sbin/pkg -j "$jail" upgrade -y || finalize 1 "Could not upgrade packages for jail ${jail}"
             # Upgrade vulture-$jail AFTER, in case of "pkg -j $jail upgrade" has removed some permissions... (like redis)
-            IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y "vulture-$jail" || finalize 1 "Could not upgrade vulture-${jail}"
+            IGNORE_OSVERSION="yes" /usr/sbin/pkg ${_pkg_options} upgrade -y "vulture-$jail" || finalize 1 "Could not upgrade vulture-${jail}"
             echo "[-] Ok."
         fi
 
@@ -411,7 +463,7 @@ if [ -z "$1" -o "$1" == "gui" ] ; then
         /usr/sbin/jexec apache /usr/sbin/service gunicorn stop
         /usr/sbin/jexec portal /usr/sbin/service gunicorn stop
         echo "[+] Updating apache and portal jails' packages..."
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-gui  || finalize 1 "Failed to upgrade package vulture-gui"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg ${_pkg_options} upgrade -y vulture-gui  || finalize 1 "Failed to upgrade package vulture-gui"
 
         /bin/echo "[+] Reloading dnsmasq..."
         # Ensure dnsmasq is up-to-date, as it could be modified during vulture-gui upgrade
@@ -445,7 +497,7 @@ fi
 if [ -z "$1" ] ; then
     if [ $do_update_packages -gt 0 ]; then
         echo "[+] Updating vulture-base ..."
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y vulture-base || finalize 1 "Failed to upgrade vulture-base"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg ${_pkg_options} upgrade -y vulture-base || finalize 1 "Failed to upgrade vulture-base"
 
         /bin/echo "[+] Reloading dnsmasq..."
         # Ensure dnsmasq is up-to-date, as it could be modified during vulture-base upgrade
@@ -461,7 +513,7 @@ fi
 if [ -z "$1" ] ; then
     if [ $do_update_packages -gt 0 ]; then
         echo "[+] Updating all packages on system..."
-        IGNORE_OSVERSION="yes" /usr/sbin/pkg upgrade -y  || finalize 1 "Error while upgrading packages"
+        IGNORE_OSVERSION="yes" /usr/sbin/pkg ${_pkg_options} upgrade -y  || finalize 1 "Error while upgrading packages"
         echo "[-] All packages updated"
     fi
 fi
@@ -469,6 +521,9 @@ fi
 if [ $clean_cache -gt 0 ]; then
     echo "[+] Cleaning pkg cache..."
     /usr/sbin/pkg clean -ay
+    if [ -n "${_pkg_options}" ]; then
+        /usr/sbin/pkg ${_pkg_options} clean -ay
+    fi
     echo "[-] Done."
     for jail in "haproxy" "apache" "portal" "mongodb" "redis" "rsyslog" ; do
         echo "[+] Cleaning pkg cache in jail ${jail}..."
