@@ -47,10 +47,10 @@ download_system_update() {
         if [ -n "$jail" ] ; then
             if [ -d /.jail_system ]; then
                 # upgrade base jail_system root with local hbsd-update.conf (for "thin" jails)
-                options="${options} -r /.jail_system/"
+                options="${options} -nr /.jail_system/"
             else
                 # use -j flag from hbsd-update to let it handle upgrade of "full" jail
-                options="${options} -j $jail"
+                options="${options} -nj $jail"
             fi
         fi
         if [ -n "$system_version" ]; then
@@ -341,7 +341,7 @@ if [ $do_update_system -gt 0 ]; then
         echo "Forcing upgrade of secadm packages (kernel version mismatch)"
         /usr/sbin/pkg upgrade -yf secadm secadm-kmod
         for jail in "haproxy" "apache" "portal" "mongodb" "redis" "rsyslog" ; do
-            /usr/sbin/pkg -j "$jail" upgrade -yf secadm secadm-kmod
+            /usr/sbin/pkg -j "$jail" upgrade -yf secadm
         done
     fi
     /bin/echo "[-] Done."
