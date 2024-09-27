@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [RSYSLOG_TEMPLATES] Control uuid generation in bulkid-template
 
 
+## [2.1.10] - 2024-04-25
+### Fixed
+- [UPDATE_SYSTEM] Don't upgrade secadm-kmod in jails
+### Changed
+- [JAILS] Don't install Kernel in jails
+
+
 ## [2.1.9]- 2024-03-04
 ### Removed
 - [JAILS] remove now-useless mkjail-* scripts
