@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [2.1.11] - 2024-09-12
+### Changed
+- [RSYSLOG_TEMPLATES] Control uuid generation in bulkid-template
+
+
 ## [2.1.10] - 2024-04-25
 ### Fixed
 - [UPDATE_SYSTEM] Don't upgrade secadm-kmod in jails
