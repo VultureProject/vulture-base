@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Fixed
+- [CLOUD_INIT] Avoid automatic cache invalidation when datasources change on a machine
 
 
 ## [2.1.11] - 2024-09-12
