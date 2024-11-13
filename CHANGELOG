@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [2.1.12] - 2024-11-13
+### Fixed
+- [CLOUD_INIT] Avoid automatic cache invalidation when datasources change on a machine
+
+
 ## [2.1.11] - 2024-09-12
 ### Changed
 - [RSYSLOG_TEMPLATES] Control uuid generation in bulkid-template
