@@ -77,8 +77,6 @@ vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/write_cert.sh
 vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/add_to_hosts.py
 vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/write_netconfig.sh
 vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/reset_mongo.sh
-vlt-os ALL=NOPASSWD:/bin/rm /etc/rc.conf.d/netaliases*
-vlt-os ALL=NOPASSWD:/bin/rm /etc/rc.conf.d/netaliases*
 
 vlt-os ALL=NOPASSWD:/sbin/pfctl -f /usr/local/etc/pf.conf
 vlt-os ALL=NOPASSWD:/sbin/pfctl -sr
