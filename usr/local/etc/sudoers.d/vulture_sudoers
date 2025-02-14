@@ -37,11 +37,12 @@ vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd start
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd stop
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service rsyslogd reload
 
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat restart
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat onestatus
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat start
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat stop
-vlt-os ALL=NOPASSWD:/usr/sbin/jexec rsyslog /usr/sbin/service filebeat reload
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat restart( [0-9]+)*$
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat onestatus( [0-9]+)*$
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat start( [0-9]+)*$
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat stop( [0-9]+)*$
+vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat reload( [0-9]+)*$
+vlt-os ALL=NOPASSWD:/bin/rm ^\/usr\/local\/etc\/filebeat\/[a-zA-Z0-9._-]+$
 
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan reload
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan restart

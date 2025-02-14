@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Removed
 - [SUDOERS] Remove deprecated entries for vlt-os user
+### Changed
+- [SUDOERS] Update sudoers' permissions for filebeat management
 
 
 ## [2.1.12] - 2024-11-13
