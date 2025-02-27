@@ -57,7 +57,14 @@ else
     /bin/echo "${ip} ${hostname}" >> /etc/hosts
 fi
 
+#TODO deprecate file
 /bin/echo "${hostname}" > /etc/host-hostname
+if [ -f /home/vlt-os/vulture_os/vulture_os/.env ]; then
+    /usr/sbin/sysrc -f /home/vlt-os/vulture_os/vulture_os/.env VULTURE_HOSTNAME="${hostname}"
+fi
+if [ -f /home/vlt-os/vulture_os/portal/.env ]; then
+    /usr/sbin/sysrc -f /home/vlt-os/vulture_os/portal/.env VULTURE_HOSTNAME="${hostname}"
+fi
 
 # Set hostname=127.0.0.2 into MongoDB jail - it can then resolve himself
 /bin/cp /etc/hosts /zroot/mongodb/etc/hosts
@@ -65,6 +72,7 @@ fi
 
 #Copy hosts file to jails
 for jail in apache mongodb redis rsyslog haproxy portal; do
+    #TODO deprecate file
     /bin/echo "${hostname}" > /zroot/${jail}/etc/host-hostname
     /bin/echo "nameserver ${jail}" > /zroot/${jail}/etc/resolv.conf
 done
