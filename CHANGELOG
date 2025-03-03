@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - [HOSTNAME] Set hostname in the new .env files if present
+### Removed
+- [SSHD] Remove custom Addendum from Version Headers
 
 
 ## [2.1.13] - 2025-02-25

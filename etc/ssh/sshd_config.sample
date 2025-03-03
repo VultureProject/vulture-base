@@ -57,7 +57,6 @@ PermitTunnel no
 
 ChrootDirectory none
 UseBlacklist no
-VersionAddendum FreeBSD-20170903
 
 # no default banner path
 Banner none
