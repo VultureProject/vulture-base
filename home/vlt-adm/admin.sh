@@ -104,9 +104,9 @@ do
 
                         /bin/rm "$tmp_file"
 
-                        if ! (echo "$management_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
-                            /usr/bin/dialog --msgbox "Management IP format incorrect" 8 60
-                        elif ! (echo "$internet_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                        # if ! (echo "$management_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
+                        #     /usr/bin/dialog --msgbox "Management IP format incorrect" 8 60
+                        if ! (echo "$internet_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
                             /usr/bin/dialog --msgbox "Internet IP format incorrect" 8 60
                         elif  ! (echo "$backends_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
                             /usr/bin/dialog --msgbox "Backends Outgoing IP format incorrect" 8 60

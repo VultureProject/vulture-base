@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [HOSTNAME] Set hostname in the new .env files if present
 ### Removed
 - [SSHD] Remove custom Addendum from Version Headers
+- [VULTURE_SUDOERS] Allow dhcp and rtsol
+- [ADMIN] Allow hostname in management_ip
 
 
 ## [2.1.13] - 2025-02-25
