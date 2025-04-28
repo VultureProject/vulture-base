@@ -61,7 +61,8 @@ tshark_user="root"
 pidfile="/var/run/vulture/tshark.pid"
 procname="/usr/local/bin/tshark"
 command="/usr/sbin/daemon"
-command_args="-f -o /var/log/pf/pf.log -p ${pidfile} ${procname} -n -l -i pflog0 -f \"not arp\" -T fields -E separator=, -e frame.time_epoch -e pflog.action -e ip.ttl -e pflog.dir -e pflog.ifname -e ip.proto -e frame.len -e pflog.rulenr -e ip.src -e tcp.srcport -e udp.srcport -e ip.dst -e tcp.dstport -e udp.dstport"
+# Limit the size of the tshark temp file for example to 100M -> -b filesize:100000 -b files:1 -w <output>
+command_args="-f -o /var/log/pf/pf.log -p ${pidfile} ${procname} -b filesize:100000 -b files:1 -w /tmp/wireshark_pflog0 -n -l -i pflog0 -f \"not arp\" -T fields -E separator=, -e frame.time_epoch -e pflog.action -e ip.ttl -e pflog.dir -e pflog.ifname -e ip.proto -e frame.len -e pflog.rulenr -e ip.src -e tcp.srcport -e udp.srcport -e ip.dst -e tcp.dstport -e udp.dstport"
 
 pflog_dev="pflog0"
 run_rc_command "$1"
