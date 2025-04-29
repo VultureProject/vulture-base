@@ -23,6 +23,8 @@ stop_postcmd="tshark_poststop"
 load_rc_config $name
 
 : ${tshark_enable="NO"}
+: ${tshark_dumpfile="/tmp/wireshark_pflog0"}
+: ${tshark_options="-b filesize:100000 -b files:1"}
 
 
 tshark_prestart()
@@ -41,6 +43,11 @@ tshark_prestart()
         if ! ifconfig $pflog_dev up; then
                 warn "could not bring up $pflog_dev."
                 return 1
+        fi
+
+        # Clean previous dumpfiles
+        if [ -n "${tshark_dumpfile}" ]; then
+                find ${tshark_dumpfile}* -type f -delete
         fi
 
         # report we're ready to run tshark
@@ -62,7 +69,7 @@ pidfile="/var/run/vulture/tshark.pid"
 procname="/usr/local/bin/tshark"
 command="/usr/sbin/daemon"
 # Limit the size of the tshark temp file for example to 100M -> -b filesize:100000 -b files:1 -w <output>
-command_args="-f -o /var/log/pf/pf.log -p ${pidfile} ${procname} -b filesize:100000 -b files:1 -w /tmp/wireshark_pflog0 -n -l -i pflog0 -f \"not arp\" -T fields -E separator=, -e frame.time_epoch -e pflog.action -e ip.ttl -e pflog.dir -e pflog.ifname -e ip.proto -e frame.len -e pflog.rulenr -e ip.src -e tcp.srcport -e udp.srcport -e ip.dst -e tcp.dstport -e udp.dstport"
+command_args="-f -o /var/log/pf/pf.log -p ${pidfile} ${procname} ${tshark_options} -w ${tshark_dumpfile} -n -l -i pflog0 -f \"not arp\" -T fields -E separator=, -e frame.time_epoch -e pflog.action -e ip.ttl -e pflog.dir -e pflog.ifname -e ip.proto -e frame.len -e pflog.rulenr -e ip.src -e tcp.srcport -e udp.srcport -e ip.dst -e tcp.dstport -e udp.dstport"
 
 pflog_dev="pflog0"
 run_rc_command "$1"
