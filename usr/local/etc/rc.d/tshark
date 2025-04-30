@@ -48,7 +48,7 @@ tshark_prestart()
 
         # Clean previous dumpfiles
         if [ -n "${tshark_dumpfile}" ]; then
-                find ${tshark_dumpfile}* -type f -delete
+                find ${tshark_dumpfile}* -type f -delete >/dev/null || true
         fi
 
         # report we're ready to run tshark
