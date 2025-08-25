@@ -72,6 +72,10 @@ vlt-os ALL=NOPASSWD:/usr/sbin/service darwin onestatus
 vlt-os ALL=NOPASSWD:/usr/sbin/service darwin start
 vlt-os ALL=NOPASSWD:/usr/sbin/service darwin restart
 
+vlt-os ALL=NOPASSWD:/usr/sbin/service ^dhclient stop( [A-Za-z0-9_]*)+$
+vlt-os ALL=NOPASSWD:/usr/sbin/service ^dhclient restart( [A-Za-z0-9_]*)+$
+vlt-os ALL=NOPASSWD:/sbin/rtsol ^([A-Za-z0-9_]*)+$
+
 vlt-os ALL=NOPASSWD:/sbin/ifconfig
 vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/get_dhcp_address.sh
 vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/write_cert.sh
