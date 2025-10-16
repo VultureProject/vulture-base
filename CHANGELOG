@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Removed
+- [HAPROXY] [SPOE] Remove obsoleted configuration files
 
 
 ## [2.1.17] - 2025-08-22
