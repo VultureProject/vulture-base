@@ -43,6 +43,7 @@ vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat start
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat stop( [0-9]+)*$
 vlt-os ALL=NOPASSWD:/usr/sbin/jexec ^rsyslog \/usr\/sbin\/service filebeat reload( [0-9]+)*$
 vlt-os ALL=NOPASSWD:/bin/rm ^(-f )?\/usr\/local\/etc\/filebeat\/[a-zA-Z0-9._-]+$
+vlt-os ALL=NOPASSWD:/bin/rm ^(-f )?\/usr\/local\/etc\/beats\/[a-zA-Z0-9._-]+$
 
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan reload
 vlt-os ALL=NOPASSWD:/usr/sbin/service strongswan restart

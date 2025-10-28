@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Added
+- [SUDOERS] Allow rm in beats config path
 ### Removed
 - [HAPROXY] [SPOE] Remove obsoleted configuration files
 
