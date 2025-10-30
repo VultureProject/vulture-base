@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ADMIN] Use new vlt-admin command instead of update_system.sh
 - [SUDOERS] Allow vlt-admin command without password prompt
 - [SYSCTL] Comment each setting and improve compatibility with hbsd14
+### Fixed
+- [RESOLV] Nameserver in jails
 
 
 ## [2.1.19] - 2026-03-06
