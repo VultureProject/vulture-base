@@ -71,10 +71,12 @@ fi
 /usr/bin/sed -i '' "s/$ip/127.0.0.2/" /zroot/mongodb/etc/hosts
 
 #Copy hosts file to jails
-for jail in apache mongodb redis rsyslog haproxy portal; do
+i=2
+for jail in mongodb redis rsyslog haproxy apache portal; do
     #TODO deprecate file
     /bin/echo "${hostname}" > /zroot/${jail}/etc/host-hostname
-    /bin/echo "nameserver ${jail}" > /zroot/${jail}/etc/resolv.conf
+    /bin/echo "nameserver 127.0.0.$i" > /zroot/${jail}/etc/resolv.conf
+    i=$((i + 1))
 done
 
 # Reload dnsmasq service to account for potential changes in /etc/hosts
