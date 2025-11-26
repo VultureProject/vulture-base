@@ -1,11 +1,13 @@
 #!/usr/bin/env sh
 # Usage update_repositories [prefix_dir]
 
+OS_RELEASE=`/usr/bin/grep 'branch="' $1/etc/hbsd-update.conf | /usr/bin/sed 's/branch="\(.*\)"/\1/'`
+OS_BRANCH_VERSION=`/usr/bin/grep 'os_version="' $1/etc/hbsd-update.conf | /usr/bin/sed 's/os_version="\(.*\)"/\1/'`
 pkg_url="http://pkg.vultureproject.org/"
 vulture_conf="Vulture.conf"
 pkg_ca="pkg.vultureproject.org"
-update_url="http://updates.vultureproject.org/"
-vulture_update_conf="hbsd-update.conf"
+update_url="http://hbsd.vultureproject.org/"
+vulture_update_conf="hbsd-update-${OS_RELEASE}-${OS_BRANCH_VERSION}.conf"
 vulture_update_ca="ca.vultureproject.org"
 temp_dir=$(mktemp -d)
 
@@ -45,8 +47,8 @@ update_repositories() {
         /bin/echo "[-]${_log_header} Done"
     fi
 
-    /bin/mkdir -p "${prefix_dir}/usr/local/etc/pkg/repos"
-    /usr/bin/printf "# HardenedBSD are now disabled by default on Vulture\n# Vulture repositories should be enough to go by, but you can delete this file if you want to enable default HBSD repos again\nHardenedBSD: { enabled: no }\n" > ${prefix_dir}/usr/local/etc/pkg/repos/HardenedBSD.disabled.conf
+    # /bin/mkdir -p "${prefix_dir}/usr/local/etc/pkg/repos"
+    # /usr/bin/printf "# HardenedBSD are now disabled by default on Vulture\n# Vulture repositories should be enough to go by, but you can delete this file if you want to enable default HBSD repos again\nHardenedBSD: { enabled: no }\n" > ${prefix_dir}/usr/local/etc/pkg/repos/HardenedBSD.disabled.conf
 
     /bin/echo -n "[*]${_log_header} Backing up default configurations:"
     for conf in ${prefix_dir}/etc/hbsd-update*.conf ; do
@@ -68,15 +70,15 @@ update_repositories() {
     fi
 
     if [ ! -f ${temp_dir}/${vulture_conf} ]; then
-        /usr/local/bin/wget -q ${pkg_url}${vulture_conf} --directory-prefix="${temp_dir}" || finalize 1 "[/] Failed to download ${vulture_conf}"
+        /usr/bin/fetch -q -o "${temp_dir}" ${pkg_url}${vulture_conf} || finalize 1 "[/] Failed to download $vulture_conf"
         /bin/echo -n "."
     fi
 
-    /bin/cp -f "${temp_dir}/${vulture_conf}" "${prefix_dir}/etc/pkg/${vulture_conf}"
+    /usr/bin/sed "s/current/${OS_RELEASE}/" "${temp_dir}/${vulture_conf}" > "${prefix_dir}/etc/pkg/${vulture_conf}"
     /bin/echo -n "."
 
     if [ ! -f ${temp_dir}/${pkg_ca} ]; then
-        /usr/local/bin/wget -q ${pkg_url}${pkg_ca} --directory-prefix="${temp_dir}" || finalize 1 "[/] Failed to download $pkg_ca"
+        /usr/bin/fetch -q -o "${temp_dir}" ${pkg_url}${pkg_ca} || finalize 1 "[/] Failed to download $pkg_ca"
         /bin/echo -n "."
     fi
 
@@ -84,15 +86,15 @@ update_repositories() {
     /bin/echo -n "."
 
     if [ ! -f ${temp_dir}/${vulture_update_conf} ]; then
-        /usr/local/bin/wget -q ${update_url}${vulture_update_conf} --directory-prefix="${temp_dir}" || finalize 1  "[/] Failed to download $vulture_update_conf"
+        /usr/bin/fetch -q -o "${temp_dir}" ${update_url}${vulture_update_conf} || finalize 1 "[/] Failed to download $vulture_update_conf"
         /bin/echo -n "."
     fi
 
-    /bin/mkdir -p "${prefix_dir}/etc" && /bin/cp -f "${temp_dir}/${vulture_update_conf}" "${prefix_dir}/etc/${vulture_update_conf}"
+    /bin/mkdir -p "${prefix_dir}/etc" && /bin/cp -f "${temp_dir}/${vulture_update_conf}" "${prefix_dir}/etc/hbsd-update.conf"
     /bin/echo -n "."
 
     if [ ! -f ${temp_dir}/${vulture_update_ca} ]; then
-        /usr/local/bin/wget -q ${update_url}${vulture_update_ca} --directory-prefix="${temp_dir}" || finalize 1  "[/] Failed to download $vulture_update_ca"
+        /usr/bin/fetch -q -o "${temp_dir}" ${update_url}${vulture_update_ca} || finalize 1 "[/] Failed to download $vulture_update_ca"
         /bin/echo -n "."
     fi
 

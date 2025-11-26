@@ -31,4 +31,25 @@ TARGET="/zroot/${JAIL_NAME}"
 /bin/echo "fd00::207 portal" >> ${TARGET}/etc/hosts
 
 # Host's dnsmasq resolver is used by jails -> local loopback of the jail
-echo "nameserver ${JAIL_NAME}" > ${TARGET}/etc/resolv.conf
+case "$JAIL_NAME" in
+    mongodb)
+        /bin/echo "nameserver 127.0.0.2" > ${TARGET}/etc/resolv.conf
+        ;;
+    redis)
+        /bin/echo "nameserver 127.0.0.3" > ${TARGET}/etc/resolv.conf
+        ;;
+    rsyslog)
+        /bin/echo "nameserver 127.0.0.4" > ${TARGET}/etc/resolv.conf
+        ;;
+    haproxy)
+        /bin/echo "nameserver 127.0.0.5" > ${TARGET}/etc/resolv.conf
+        ;;
+    apache)
+        /bin/echo "nameserver 127.0.0.6" > ${TARGET}/etc/resolv.conf
+        ;;
+    portal)
+        /bin/echo "nameserver 127.0.0.7" > ${TARGET}/etc/resolv.conf
+        ;;
+    *)
+        ;;
+esac
