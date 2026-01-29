@@ -6,6 +6,7 @@ vlt-adm ALL=NOPASSWD:/usr/sbin/kbdmap
 vlt-adm ALL=NOPASSWD:/usr/sbin/ntpdate
 vlt-adm ALL=NOPASSWD:/bin/hostname
 
+vlt-adm ALL=NOPASSWD:/usr/local/bin/vlt-admin
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/write_ntp.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/write_aliases.sh
 vlt-adm ALL=NOPASSWD:/home/vlt-adm/system/proxy.sh

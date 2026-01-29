@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Changed
+- [ADMIN] Use new vlt-admin command instead of update_system.sh
+- [SUDOERS] Allow vlt-admin command without password prompt
 
 
 ## [2.1.19] - 2026-03-06
