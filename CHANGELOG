@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+
+## [2.1.19] - 2026-03-06
 ### Added
 - [RSYSLOG_TEMPLATES] New raw_message_nolf template to send logs without newline added
 
