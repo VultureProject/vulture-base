@@ -120,7 +120,8 @@ do
                     ;;
                 "update")
                     check_jails
-                    /usr/local/bin/sudo /home/vlt-adm/system/update_system.sh
+                    /usr/local/bin/sudo /usr/local/bin/vlt-admin upgrade-os -B all
+                    /usr/local/bin/sudo /usr/local/bin/vlt-admin upgrade-pkg
                     ;;
                 "exit")
                     break
