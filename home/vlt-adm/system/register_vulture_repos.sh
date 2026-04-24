@@ -7,7 +7,6 @@ pkg_url="http://pkg.vultureproject.org/"
 vulture_conf="Vulture.conf"
 pkg_ca="pkg.vultureproject.org"
 update_url="http://hbsd.vultureproject.org/"
-vulture_update_conf="hbsd-update-${OS_RELEASE}-${OS_BRANCH_VERSION}.conf"
 vulture_update_ca="ca.vultureproject.org"
 temp_dir=$(mktemp -d)
 
@@ -34,6 +33,7 @@ finalize() {
 
 update_repositories() {
     prefix_dir="$1"
+    vulture_update_conf="${2:-hbsd-update-$OS_RELEASE-$OS_BRANCH_VERSION.conf}"
     _log_header=""
     if [ -n "$prefix_dir" ]; then
         _log_header="[${prefix_dir}]"
@@ -46,9 +46,6 @@ update_repositories() {
         fi
         /bin/echo "[-]${_log_header} Done"
     fi
-
-    # /bin/mkdir -p "${prefix_dir}/usr/local/etc/pkg/repos"
-    # /usr/bin/printf "# HardenedBSD are now disabled by default on Vulture\n# Vulture repositories should be enough to go by, but you can delete this file if you want to enable default HBSD repos again\nHardenedBSD: { enabled: no }\n" > ${prefix_dir}/usr/local/etc/pkg/repos/HardenedBSD.disabled.conf
 
     /bin/echo -n "[*]${_log_header} Backing up default configurations:"
     for conf in ${prefix_dir}/etc/hbsd-update*.conf ; do
@@ -102,6 +99,6 @@ update_repositories() {
     /bin/echo "."
 }
 
-update_repositories "$1"
+update_repositories "$1" "$2"
 
 finalize
