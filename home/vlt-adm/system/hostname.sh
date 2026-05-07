@@ -70,14 +70,9 @@ if [ -f /tmp/bsdinstall_etc/rc.conf.hostname ]; then
         # Initialize the mongoDB replicaset, if bootstrap is not done yet
         if ! /usr/local/bin/sudo -u vlt-os /home/vlt-os/env/bin/python /home/vlt-os/vulture_os/manage.py check >/dev/null 2>&1 ; then
             export hostname=${hostname}
-            options="--ssl --sslPEMKeyFile /var/db/pki/node.pem --sslCAFile /var/db/pki/ca.pem"
-            # If the management IP is an IPv6 address
-            if [ "$(/bin/echo "$ip" | /usr/bin/grep ":")" ] ; then
-                options="--ipv6 $options"
-            fi
             # Populate mongoDB, if bootstrap is not done yet
-            command='/bin/echo rs.initiate\(\{_id:\"Vulture\", members:\[\{_id:0,host:\"'${hostname}':9091\"\}\]\}\) | /usr/local/bin/mongo '${options}' '${hostname}':9091/vulture'
-            if /usr/sbin/jexec mongodb /bin/csh -c "$command" ; then
+            command='rs.initiate({_id:"Vulture", members:[{_id:0,host:"'${hostname}':9091"}]})'
+            if /usr/local/bin/vlt-admin connect mongodb "$command" ; then
                 ## Django migrations
                 /home/vlt-adm/gui/django_migration.sh
             else
