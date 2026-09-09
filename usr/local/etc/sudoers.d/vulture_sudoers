@@ -80,6 +80,7 @@ vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/write_netconfig.sh
 vlt-os ALL=NOPASSWD:/home/vlt-os/scripts/reset_mongo.sh
 
 vlt-os ALL=NOPASSWD:/sbin/pfctl -f /usr/local/etc/pf.conf
+vlt-os ALL=NOPASSWD:/sbin/pfctl -n -f -
 vlt-os ALL=NOPASSWD:/sbin/pfctl -sr
 vlt-os ALL=NOPASSWD:/usr/sbin/service pf start
 vlt-os ALL=NOPASSWD:/usr/sbin/service pf stop

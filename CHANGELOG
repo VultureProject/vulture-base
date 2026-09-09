@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [SUDOERS] Allow vlt-admin command without password prompt
 - [SYSCTL] Comment each setting and improve compatibility with hbsd14
 - [CLOUD_INIT] Add support for 4 partitions in growpart module
+- [VULTURE_SUDOERS] Allow permissions for pfctl configtest
 ### Fixed
 - [RESOLV] Nameserver in jails
 - [HOSTNAME] Replace mongo call with vlt-admin connect
