@@ -24,7 +24,11 @@ if [ -z "${api_key}" ]; then
     read api_key
 fi
 
-/home/vlt-os/scripts/add_to_hosts.py "$master_hostname" "$master_ip"
+case $(echo "$master_ip" | cut -c1) in
+    [0-9]) /home/vlt-os/scripts/add_to_hosts.py "$master_hostname" "$master_ip" ;;
+    [a-zA-Z]) echo "Master IP is a hostname, no need to add to /etc/hosts" ;;
+    *) echo "Error: Master IP is not valid."; exit 1 ;;
+esac
 
 /usr/sbin/jexec redis service redis restart
 /usr/sbin/jexec apache service gunicorn stop
