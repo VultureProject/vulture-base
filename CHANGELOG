@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - [RC.LOCAL] Crash if swap partition does not exist
 - [DJANGO_MIGRATION] Prevent vultured crash if logs directory has wrong ownership
+- [ADMIN] Fix dialog call for HBSD15
 
 
 ## [2.2.0] - 2026-07-20

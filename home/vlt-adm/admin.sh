@@ -29,9 +29,14 @@ check_jails() {
 
 # Create a temporary file and make sure it goes away when we're dome
 tmp_file="/var/tmp/dialog$$"
+if /usr/bin/command -v bsddialog >/dev/null; then
+    dialog_bin="/usr/bin/bsddialog"
+else
+    dialog_bin="/usr/bin/dialog"
+fi
 while :
 do
-    /usr/bin/dialog --clear --colors --title "Welcome on Vulture OS" --menu "Please choose an action" 20 100 13 \
+    $dialog_bin --clear --colors --title "Welcome on Vulture OS" --menu "Please choose an action" 20 100 13 \
     "keymap" "Keyboard config"      \
     "time" "Time config"            \
     "password" "Modify vlt-adm's password" \
@@ -44,7 +49,7 @@ do
     "shell" "CSH Shell"        \
     "rootshell" "ROOT Shell"        \
     "update" "Update OS"            \
-    "exit" "Exit" --stdout > "$tmp_file"
+    "exit" "Exit" 2>"$tmp_file"
 
     return_value=$?
     case "$return_value" in
@@ -54,8 +59,8 @@ do
             case "$action" in
                 "email")
                     /bin/rm -f "$tmp_file"
-                    email=`grep '^root:' /etc/mail/aliases | sed -E 's/^.*:.([a-zA-Z0-9_\.-]+@[a-zA-Z0-9_\.-]+)$/\1/g'`
-                    if /usr/bin/dialog --title "Vulture Alert Email address" --inputbox "Enter the email address to send alerts to" 8 60 "${email}" --stdout > "$tmp_file"; then
+                    email=$(grep '^root:' /etc/mail/aliases | sed -E 's/^.*:.([a-zA-Z0-9_\.-]+@[a-zA-Z0-9_\.-]+)$/\1/g')
+                    if $dialog_bin --title "Vulture Alert Email address" --inputbox "Enter the email address to send alerts to" 8 60 "${email}" 2> "$tmp_file"; then
                         email="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
 
@@ -66,7 +71,7 @@ do
                     /usr/bin/passwd vlt-adm
                     ;;
                 "geli_change")
-                    if /usr/bin/dialog --title "Vulture Encryption passphrase" --inputbox "Enter a new encryption passphrase" 8 60 "" --stdout > "$tmp_file"; then
+                    if $dialog_bin --title "Vulture Encryption passphrase" --inputbox "Enter a new encryption passphrase" 8 60 "" 2> "$tmp_file"; then
                         passphrase="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
                         /usr/local/bin/sudo /home/vlt-adm/system/geli-passphrase.sh "${passphrase}"
@@ -90,12 +95,12 @@ do
                     logom_outgoing_ip="$(/usr/sbin/sysrc -f /etc/rc.conf.d/network -n logom_outgoing_ip 2> /dev/null)"
                     logom_outgoing_ip="${logom_outgoing_ip:-${management_ip}}"
 
-                    if /usr/bin/dialog --title "Vulture Node Network settings" --form "Choose the Node's network IP Addresses" 14 60 8 \
+                    if $dialog_bin --title "Vulture Node Network settings" --form "Choose the Node's network IP Addresses" 14 60 8 \
                     "Management IP Address:" 1 1 "$management_ip" 1 25 25 30 \
                     "Internet IP:" 3 1 "$internet_ip" 3 25 25 30 \
                     "Backends Outgoing IP:" 5 1 "$backends_outgoing_ip" 5 25 25 30 \
                     "LogOM Outgoing IP:" 7 1 "$logom_outgoing_ip" 7 25 25 30 \
-                    --stdout > "$tmp_file"; then
+                    2> "$tmp_file"; then
 
                         management_ip="$(/usr/bin/sed -n 1p "$tmp_file")"
                         internet_ip="$(/usr/bin/sed -n 2p "$tmp_file")"
@@ -105,13 +110,13 @@ do
                         /bin/rm "$tmp_file"
 
                         if ! (echo "$management_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
-                            /usr/bin/dialog --msgbox "Management IP format incorrect" 8 60
+                            $dialog_bin --msgbox "Management IP format incorrect" 8 60
                         elif ! (echo "$internet_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
-                            /usr/bin/dialog --msgbox "Internet IP format incorrect" 8 60
+                            $dialog_bin --msgbox "Internet IP format incorrect" 8 60
                         elif  ! (echo "$backends_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
-                            /usr/bin/dialog --msgbox "Backends Outgoing IP format incorrect" 8 60
+                            $dialog_bin --msgbox "Backends Outgoing IP format incorrect" 8 60
                         elif  ! (echo "$logom_outgoing_ip" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}$)|(^([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}$)'); then
-                            /usr/bin/dialog --msgbox "LogOM Outgoing IP format incorrect" 8 60
+                            $dialog_bin --msgbox "LogOM Outgoing IP format incorrect" 8 60
                         else
                             /usr/local/bin/sudo /home/vlt-adm/system/netconfig-resolv.sh
                             /usr/local/bin/sudo /home/vlt-adm/system/network-ips.sh "${management_ip}" "${internet_ip}" "${backends_outgoing_ip}" "${logom_outgoing_ip}"
@@ -137,14 +142,14 @@ do
                     if [ -f /etc/rc.conf.proxy ]; then
                         proxy="$(/usr/bin/grep "http_" /etc/rc.conf.proxy | /usr/bin/sed 's/.*http:\/\///')"
                     fi
-                    if /usr/bin/dialog --title "Vulture HTTP Proxy setting" --inputbox "Enter HTTP proxy address (IPv4:port or [IPv6]:port)" 8 60 "${proxy}" --stdout > "$tmp_file"; then
+                    if $dialog_bin --title "Vulture HTTP Proxy setting" --inputbox "Enter HTTP proxy address (IPv4:port or [IPv6]:port)" 8 60 "${proxy}" > "$tmp_file"; then
                         proxy="$(/bin/cat "$tmp_file")"
                         /bin/rm "$tmp_file"
 
                         if echo "$proxy" | grep -Eq '(^([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}:[[:digit:]]{1,5}$)|(^\[([[:xdigit:]]{0,4}:){2,7}[[:xdigit:]]{0,4}\]:[[:digit:]]{1,5}$)' || [ -z "$proxy" ] ; then
                             /usr/local/bin/sudo /home/vlt-adm/system/proxy.sh "${proxy}"
                         else
-                            /usr/bin/dialog --msgbox "IP format incorrect" 8 60
+                            $dialog_bin --msgbox "IP format incorrect" 8 60
                         fi
 
                     fi
